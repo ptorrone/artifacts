@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EE BENCH 01 // RC FILTER · PCB TRACE</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=VT323&display=swap');
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #060a09;
+  --bg-deep: #030605;
+  --panel: #0d1413;
+  --panel-light: #141d1b;
+  --panel-edge: #1c2826;
+  --grid: rgba(0, 220, 130, 0.06);
+  --grid-major: rgba(0, 220, 130, 0.18);
+  --phosphor: #00ff88;
+  --phosphor-dim: #00b266;
+  --phosphor-trace: #00ffaa;
+  --amber: #ffb000;
+  --amber-dim: #cc8a00;
+  --red: #ff4055;
+  --text: #b8c8c5;
+  --text-dim: #5a6b68;
+  --border: #1d2a28;
+  --border-bright: #2d4340;
+}
+
+body {
+  background: var(--bg);
+  background-image:
+    radial-gradient(ellipse at top, rgba(0, 80, 50, 0.10), transparent 60%),
+    radial-gradient(ellipse at bottom, rgba(0, 60, 40, 0.06), transparent 50%);
+  color: var(--text);
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 13px;
+  min-height: 100vh;
+  padding: 24px;
+  letter-spacing: 0.02em;
+}
+
+.chassis {
+  max-width: 1320px;
+  margin: 0 auto;
+  background: var(--panel);
+  border: 1px solid var(--panel-edge);
+  border-radius: 4px;
+  box-shadow:
+    0 0 0 1px rgba(0,0,0,0.5),
+    inset 0 1px 0 rgba(255,255,255,0.03),
+    0 30px 80px rgba(0,0,0,0.6);
+  overflow: hidden;
+  position: relative;
+}
+
+.chassis::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(0deg,
+    transparent 0, transparent 3px,
+    rgba(0,0,0,0.04) 3px, rgba(0,0,0,0.04) 4px);
+  mix-blend-mode: multiply;
+  z-index: 100;
+}
+
+/* HEADER */
+.bezel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 28px;
+  background: linear-gradient(to bottom, var(--panel-light), var(--panel));
+  border-bottom: 1px solid var(--border);
+  position: relative;
+  gap: 24px;
+}
+
+.bezel::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--phosphor-dim), transparent);
+  opacity: 0.5;
+}
+
+.brand { display: flex; align-items: center; gap: 14px; }
+.logo {
+  font-family: 'VT323', monospace;
+  font-size: 32px;
+  color: var(--phosphor);
+  text-shadow: 0 0 10px rgba(0, 255, 136, 0.7);
+  line-height: 1;
+}
+.brand-name {
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  color: var(--text);
+  font-size: 14px;
+}
+.brand-sub {
+  font-size: 10px;
+  color: var(--text-dim);
+  letter-spacing: 0.32em;
+  margin-top: 3px;
+}
+
+.bezel-meta { display: flex; gap: 24px; font-size: 10px; letter-spacing: 0.25em; color: var(--text-dim); }
+.meta-item .v { color: var(--phosphor); margin-left: 8px; }
+
+.leds { display: flex; gap: 8px; }
+.led {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: #1a2422;
+  box-shadow: inset 0 0 0 1px #000;
+}
+.led.green {
+  background: var(--phosphor);
+  box-shadow: 0 0 8px var(--phosphor), inset 0 0 0 1px #003322;
+  animation: pulse 2.6s ease-in-out infinite;
+}
+.led.amber {
+  background: var(--amber);
+  box-shadow: 0 0 8px var(--amber), inset 0 0 0 1px #332200;
+}
+@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.55; } }
+
+/* MODULES */
+.module { border-bottom: 1px solid var(--border); }
+.module:last-of-type { border-bottom: none; }
+
+.module-bar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 28px;
+  background: linear-gradient(to bottom, #0a1110, #060a09);
+  border-bottom: 1px solid var(--border);
+  font-size: 11px;
+  letter-spacing: 0.2em;
+}
+.module-bar .ch {
+  background: var(--phosphor);
+  color: #001a0e;
+  padding: 3px 11px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  box-shadow: 0 0 12px rgba(0, 255, 136, 0.35);
+}
+.module-bar .title { flex: 1; color: var(--text); font-weight: 500; }
+.module-bar .formula { color: var(--phosphor-dim); font-size: 11px; letter-spacing: 0.1em; }
+
+.module-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-bottom: 1px solid var(--border);
+}
+
+.controls {
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 26px;
+  border-right: 1px solid var(--border);
+}
+
+.control label {
+  display: block;
+  font-size: 10px;
+  letter-spacing: 0.32em;
+  color: var(--text-dim);
+  margin-bottom: 10px;
+}
+
+/* SLIDER */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 28px;
+  background: transparent;
+  cursor: pointer;
+}
+input[type="range"]::-webkit-slider-runnable-track {
+  width: 100%;
+  height: 6px;
+  background: linear-gradient(to bottom, #050807, #0a1211);
+  border: 1px solid var(--border-bright);
+  border-radius: 1px;
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.5), 0 1px 0 rgba(255,255,255,0.03);
+}
+input[type="range"]::-moz-range-track {
+  width: 100%; height: 6px;
+  background: linear-gradient(to bottom, #050807, #0a1211);
+  border: 1px solid var(--border-bright);
+  border-radius: 1px;
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 22px; height: 26px;
+  margin-top: -10px;
+  background: linear-gradient(to bottom, #2a3a37 0%, #1a2624 50%, #0a1311 100%);
+  border: 1px solid var(--phosphor-dim);
+  border-radius: 1px;
+  box-shadow:
+    0 0 8px rgba(0, 255, 136, 0.35),
+    inset 0 1px 0 rgba(0, 255, 136, 0.2),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.5);
+  cursor: grab;
+  transition: box-shadow 0.15s;
+}
+input[type="range"]::-webkit-slider-thumb:hover {
+  box-shadow:
+    0 0 16px rgba(0, 255, 136, 0.7),
+    inset 0 1px 0 rgba(0, 255, 136, 0.3);
+}
+input[type="range"]::-webkit-slider-thumb:active { cursor: grabbing; }
+input[type="range"]::-moz-range-thumb {
+  width: 22px; height: 26px;
+  background: linear-gradient(to bottom, #2a3a37, #0a1311);
+  border: 1px solid var(--phosphor-dim);
+  border-radius: 1px;
+  box-shadow: 0 0 8px rgba(0, 255, 136, 0.35);
+  cursor: grab;
+}
+
+.val-row { display: flex; align-items: baseline; gap: 8px; margin-top: 14px; }
+.big-val {
+  font-family: 'VT323', monospace;
+  font-size: 42px;
+  line-height: 1;
+  color: var(--phosphor);
+  text-shadow: 0 0 14px rgba(0, 255, 136, 0.45);
+  letter-spacing: 0.02em;
+}
+.unit { font-size: 12px; color: var(--text-dim); letter-spacing: 0.15em; }
+.sub-val { font-size: 10px; color: var(--text-dim); margin-top: 5px; letter-spacing: 0.1em; }
+
+/* READOUTS */
+.readouts {
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  justify-content: center;
+  background:
+    radial-gradient(ellipse at center, rgba(0, 50, 30, 0.18), transparent 70%),
+    var(--panel);
+}
+.readout {
+  padding: 18px 22px;
+  background: var(--bg-deep);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  box-shadow: inset 0 1px 4px rgba(0,0,0,0.6), 0 1px 0 rgba(255,255,255,0.02);
+}
+.readout-label { font-size: 10px; color: var(--text-dim); letter-spacing: 0.32em; margin-bottom: 8px; }
+.readout-val { display: flex; align-items: baseline; gap: 12px; }
+.readout-val > span:first-child {
+  font-family: 'VT323', monospace;
+  font-size: 60px;
+  line-height: 1;
+  color: var(--amber);
+  text-shadow: 0 0 16px rgba(255, 176, 0, 0.45);
+  letter-spacing: 0.02em;
+}
+.readout.small .readout-val > span:first-child { font-size: 38px; }
+
+/* LAYER TOGGLE */
+.layer-toggle { display: flex; gap: 0; margin-top: 4px; }
+.layer-toggle button {
+  flex: 1;
+  padding: 11px 12px;
+  background: var(--bg-deep);
+  border: 1px solid var(--border-bright);
+  color: var(--text-dim);
+  font-family: inherit;
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.layer-toggle button:first-child { border-right: none; }
+.layer-toggle button.active {
+  background: linear-gradient(to bottom, #0a2018, #051411);
+  color: var(--phosphor);
+  box-shadow: inset 0 0 14px rgba(0, 255, 136, 0.22), inset 0 1px 0 rgba(0, 255, 136, 0.12);
+  border-color: var(--phosphor-dim);
+}
+.layer-toggle button:hover:not(.active) { color: var(--text); }
+
+/* PLOT */
+.plot-frame {
+  position: relative;
+  padding: 18px 28px 28px;
+  background: radial-gradient(ellipse at center, rgba(0, 30, 20, 0.3), transparent 80%), var(--bg-deep);
+}
+.plot-frame::before {
+  content: '';
+  position: absolute;
+  inset: 18px 28px 28px;
+  background: repeating-linear-gradient(0deg,
+    transparent 0, transparent 2px,
+    rgba(0,0,0,0.15) 2px, rgba(0,0,0,0.15) 3px);
+  pointer-events: none;
+  z-index: 5;
+  border-radius: 2px;
+}
+
+svg.plot {
+  display: block;
+  width: 100%;
+  height: 380px;
+  background: linear-gradient(to bottom, #030605, #050a08);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  cursor: crosshair;
+}
+#bode-plot { cursor: default; }
+
+.plot-hint {
+  position: absolute;
+  bottom: 10px;
+  right: 36px;
+  font-size: 9px;
+  color: var(--text-dim);
+  letter-spacing: 0.22em;
+  z-index: 10;
+}
+
+/* SVG STYLING */
+.grid-line { stroke: var(--grid); stroke-width: 1; shape-rendering: crispEdges; }
+.grid-line.major { stroke: var(--grid-major); }
+.axis-label { fill: var(--text-dim); font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.08em; }
+.axis-title { fill: var(--text-dim); font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.28em; }
+
+.trace {
+  fill: none;
+  stroke: var(--phosphor-trace);
+  stroke-width: 2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  filter: drop-shadow(0 0 4px rgba(0, 255, 170, 0.65));
+}
+.trace-amber { stroke: var(--amber); filter: drop-shadow(0 0 4px rgba(255, 176, 0, 0.65)); }
+
+.marker-line { stroke-width: 1; stroke-dasharray: 3 3; opacity: 0.75; }
+.marker-line.amber { stroke: var(--amber); }
+.marker-line.green { stroke: var(--phosphor); }
+.marker-dot { filter: drop-shadow(0 0 6px currentColor); }
+.marker-label {
+  font-family: 'VT323', monospace;
+  font-size: 16px;
+  letter-spacing: 0.04em;
+}
+
+/* FOOTER */
+.footer {
+  padding: 14px 28px;
+  background: var(--panel-light);
+  border-top: 1px solid var(--border);
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  color: var(--text-dim);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+@media (max-width: 920px) {
+  body { padding: 8px; }
+  .module-grid { grid-template-columns: 1fr; }
+  .controls { border-right: none; border-bottom: 1px solid var(--border); }
+  .module-bar { flex-wrap: wrap; gap: 8px; padding: 10px 16px; font-size: 10px; }
+  .module-bar .formula { font-size: 9px; flex-basis: 100%; }
+  .bezel { padding: 12px 16px; flex-wrap: wrap; gap: 12px; }
+  .controls, .readouts, .plot-frame { padding: 18px; }
+  .readout-val > span:first-child { font-size: 44px; }
+  .big-val { font-size: 34px; }
+  svg.plot { height: 280px; }
+}
+</style>
+</head>
+<body>
+<div class="chassis">
+
+  <header class="bezel">
+    <div class="brand">
+      <div class="logo">⊕</div>
+      <div>
+        <div class="brand-name">EE BENCH 01</div>
+        <div class="brand-sub">DUAL CHANNEL · INTERACTIVE</div>
+      </div>
+    </div>
+    <div class="bezel-meta">
+      <div class="meta-item">REV<span class="v">A.0</span></div>
+      <div class="meta-item">SN<span class="v">0001</span></div>
+    </div>
+    <div class="leds">
+      <div class="led green"></div>
+      <div class="led green"></div>
+      <div class="led amber"></div>
+    </div>
+  </header>
+
+  <!-- ============================================================
+       MODULE 1: RC LOW-PASS FILTER
+       ============================================================ -->
+  <section class="module">
+    <div class="module-bar">
+      <span class="ch">CH 1</span>
+      <span class="title">RC LOW-PASS FILTER · MAGNITUDE RESPONSE</span>
+      <span class="formula">fc = 1 / 2πRC</span>
+    </div>
+
+    <div class="module-grid">
+      <div class="controls">
+        <div class="control">
+          <label>RESISTOR · R</label>
+          <input type="range" id="r-slider" min="0" max="1000" value="400">
+          <div class="val-row">
+            <span class="big-val" id="r-val">10.0</span>
+            <span class="unit" id="r-unit">kΩ</span>
+          </div>
+        </div>
+        <div class="control">
+          <label>CAPACITOR · C</label>
+          <input type="range" id="c-slider" min="0" max="1000" value="625">
+          <div class="val-row">
+            <span class="big-val" id="c-val">100</span>
+            <span class="unit" id="c-unit">nF</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="readouts">
+        <div class="readout">
+          <div class="readout-label">CUTOFF FREQUENCY · fc</div>
+          <div class="readout-val">
+            <span id="fc-val">159</span>
+            <span class="unit" id="fc-unit">Hz</span>
+          </div>
+        </div>
+        <div class="readout small">
+          <div class="readout-label">TIME CONSTANT · τ = RC</div>
+          <div class="readout-val">
+            <span id="tau-val">1.00</span>
+            <span class="unit" id="tau-unit">ms</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="plot-frame">
+      <svg class="plot" id="bode-plot" viewBox="0 0 800 380" preserveAspectRatio="none"></svg>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       MODULE 2: PCB TRACE CURRENT
+       ============================================================ -->
+  <section class="module">
+    <div class="module-bar">
+      <span class="ch">CH 2</span>
+      <span class="title">PCB TRACE / CURRENT CAPACITY · IPC-2221</span>
+      <span class="formula">I = k · ΔT^0.44 · A^0.725</span>
+    </div>
+
+    <div class="module-grid">
+      <div class="controls">
+        <div class="control">
+          <label>COPPER WEIGHT · t</label>
+          <input type="range" id="t-slider" min="0" max="1000" value="500">
+          <div class="val-row">
+            <span class="big-val" id="t-val">1.00</span>
+            <span class="unit">oz/ft²</span>
+          </div>
+          <div class="sub-val" id="t-sub">≈ 1.38 mils · 35 µm</div>
+        </div>
+        <div class="control">
+          <label>TEMP RISE · ΔT</label>
+          <input type="range" id="dt-slider" min="5" max="60" value="20">
+          <div class="val-row">
+            <span class="big-val" id="dt-val">20</span>
+            <span class="unit">°C above ambient</span>
+          </div>
+        </div>
+        <div class="control">
+          <label>LAYER</label>
+          <div class="layer-toggle">
+            <button class="active" data-k="0.048">EXTERNAL · k=0.048</button>
+            <button data-k="0.024">INTERNAL · k=0.024</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="readouts">
+        <div class="readout">
+          <div class="readout-label">@ <span id="cursor-w">100</span> mil WIDTH · <span id="cursor-w-mm">2.54</span> mm</div>
+          <div class="readout-val">
+            <span id="i-val">6.37</span>
+            <span class="unit">A MAX</span>
+          </div>
+        </div>
+        <div class="readout small">
+          <div class="readout-label">CROSS-SECTION · A</div>
+          <div class="readout-val">
+            <span id="a-val">138</span>
+            <span class="unit">mil²</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="plot-frame">
+      <svg class="plot" id="pcb-plot" viewBox="0 0 800 380" preserveAspectRatio="none"></svg>
+      <div class="plot-hint">CLICK / DRAG ON PLOT TO PROBE WIDTH</div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <span>FOR DESIGN ASSISTANCE · IPC-2221 IS A REFERENCE FORMULA · VERIFY EMPIRICALLY · DERATE FOR HIGH-RELIABILITY</span>
+    <span>EE BENCH 01 · v1.0</span>
+  </footer>
+</div>
+
+<script>
+// ============================================================================
+//  COMMON
+// ============================================================================
+const PLOT_W = 800;
+const PLOT_H = 380;
+const PAD_L = 64;
+const PAD_R = 28;
+const PAD_T = 26;
+const PAD_B = 46;
+
+function decLabel(f) {
+  if (f >= 1e9) return (f/1e9) + 'G';
+  if (f >= 1e6) return (f/1e6) + 'M';
+  if (f >= 1e3) return (f/1e3) + 'k';
+  if (f >= 1)   return '' + Math.round(f);
+  if (f >= 1e-3) return (f*1000).toFixed(0) + 'm';
+  return f.toExponential(0);
+}
+
+// ============================================================================
+//  MODULE 1 · RC LOW-PASS FILTER
+// ============================================================================
+
+// R: log scale 100Ω to 10MΩ (5 decades)
+function sliderToR(s) { return Math.pow(10, 2 + (s/1000) * 5); }
+// C: log scale 1pF to 100µF (8 decades)
+function sliderToC(s) { return Math.pow(10, -12 + (s/1000) * 8); }
+
+function fmtR(R) {
+  if (R < 1e3)  return [R.toPrecision(3), 'Ω'];
+  if (R < 1e6)  return [(R/1e3).toPrecision(3), 'kΩ'];
+  return [(R/1e6).toPrecision(3), 'MΩ'];
+}
+function fmtC(C) {
+  if (C < 1e-9) return [(C*1e12).toPrecision(3), 'pF'];
+  if (C < 1e-6) return [(C*1e9).toPrecision(3),  'nF'];
+  if (C < 1e-3) return [(C*1e6).toPrecision(3),  'µF'];
+  return [(C*1e3).toPrecision(3), 'mF'];
+}
+function fmtFreq(f) {
+  if (f < 1)    return [f.toPrecision(3), 'Hz'];
+  if (f < 1e3)  return [f.toPrecision(3), 'Hz'];
+  if (f < 1e6)  return [(f/1e3).toPrecision(3), 'kHz'];
+  if (f < 1e9)  return [(f/1e6).toPrecision(3), 'MHz'];
+  return [(f/1e9).toPrecision(3), 'GHz'];
+}
+function fmtTau(t) {
+  if (t < 1e-6) return [(t*1e9).toPrecision(3), 'ns'];
+  if (t < 1e-3) return [(t*1e6).toPrecision(3), 'µs'];
+  if (t < 1)    return [(t*1e3).toPrecision(3), 'ms'];
+  return [t.toPrecision(3), 's'];
+}
+
+function drawBodePlot(R, C) {
+  const fc = 1 / (2 * Math.PI * R * C);
+  const fcLog = Math.log10(fc);
+  const fminLog = Math.floor(fcLog) - 2;
+  const fmaxLog = fminLog + 6;
+  const fmin = Math.pow(10, fminLog);
+  const fmax = Math.pow(10, fmaxLog);
+
+  const dBmax = 5;
+  const dBmin = -80;
+
+  const xMap = f => PAD_L + (Math.log10(f) - fminLog) / 6 * (PLOT_W - PAD_L - PAD_R);
+  const yMap = dB => PAD_T + (dBmax - dB) / (dBmax - dBmin) * (PLOT_H - PAD_T - PAD_B);
+
+  let s = '';
+
+  // grid: frequency (log)
+  for (let dec = fminLog; dec <= fmaxLog; dec++) {
+    const fMain = Math.pow(10, dec);
+    const x = xMap(fMain);
+    s += `<line class="grid-line major" x1="${x}" y1="${PAD_T}" x2="${x}" y2="${PLOT_H - PAD_B}"/>`;
+    for (let m = 2; m <= 9; m++) {
+      const f = m * fMain;
+      if (f > fmin && f < fmax) {
+        const xm = xMap(f);
+        s += `<line class="grid-line" x1="${xm}" y1="${PAD_T}" x2="${xm}" y2="${PLOT_H - PAD_B}"/>`;
+      }
+    }
+    s += `<text class="axis-label" x="${x}" y="${PLOT_H - PAD_B + 16}" text-anchor="middle">${decLabel(fMain)}</text>`;
+  }
+
+  // grid: magnitude (linear, every 10 dB)
+  for (let dB = dBmin; dB <= dBmax; dB += 10) {
+    const y = yMap(dB);
+    const cls = (dB === 0) ? 'major' : '';
+    s += `<line class="grid-line ${cls}" x1="${PAD_L}" y1="${y}" x2="${PLOT_W - PAD_R}" y2="${y}"/>`;
+    s += `<text class="axis-label" x="${PAD_L - 8}" y="${y + 3}" text-anchor="end">${dB}</text>`;
+  }
+
+  // -3 dB reference line
+  const y3 = yMap(-3);
+  s += `<line x1="${PAD_L}" y1="${y3}" x2="${PLOT_W - PAD_R}" y2="${y3}" stroke="rgba(255,176,0,0.25)" stroke-width="1" stroke-dasharray="2 4"/>`;
+  s += `<text class="axis-label" x="${PLOT_W - PAD_R - 4}" y="${y3 - 4}" text-anchor="end" fill="#ffb000aa">-3 dB</text>`;
+
+  // border
+  s += `<rect x="${PAD_L}" y="${PAD_T}" width="${PLOT_W - PAD_L - PAD_R}" height="${PLOT_H - PAD_T - PAD_B}" fill="none" stroke="rgba(0,220,130,0.3)" stroke-width="1"/>`;
+
+  // axis titles
+  s += `<text class="axis-title" x="${PLOT_W - PAD_R}" y="${PLOT_H - 10}" text-anchor="end">FREQ · Hz · LOG</text>`;
+  s += `<text class="axis-title" x="${PAD_L}" y="${PAD_T - 10}">|H| · dB</text>`;
+
+  // fc marker (vertical + dot at -3 dB)
+  const xfc = xMap(fc);
+  if (xfc >= PAD_L && xfc <= PLOT_W - PAD_R) {
+    s += `<line class="marker-line amber" x1="${xfc}" y1="${PAD_T}" x2="${xfc}" y2="${PLOT_H - PAD_B}"/>`;
+    s += `<circle class="marker-dot" cx="${xfc}" cy="${y3}" r="4.5" fill="#ffb000" style="color:#ffb000"/>`;
+    const [fv, fu] = fmtFreq(fc);
+    const labelX = xfc + 10 < PLOT_W - PAD_R - 80 ? xfc + 10 : xfc - 10;
+    const anchor = xfc + 10 < PLOT_W - PAD_R - 80 ? 'start' : 'end';
+    s += `<text class="marker-label" x="${labelX}" y="${PAD_T + 18}" fill="#ffb000" text-anchor="${anchor}">fc = ${fv} ${fu}</text>`;
+  }
+
+  // the trace
+  const N = 400;
+  let path = '';
+  for (let i = 0; i <= N; i++) {
+    const t = i / N;
+    const f = Math.pow(10, fminLog + t * 6);
+    const ratio = f / fc;
+    const mag_dB = -10 * Math.log10(1 + ratio*ratio);
+    const x = xMap(f);
+    let y = yMap(mag_dB);
+    if (y > PLOT_H - PAD_B) y = PLOT_H - PAD_B;
+    path += (i === 0 ? 'M' : 'L') + x.toFixed(1) + ',' + y.toFixed(1) + ' ';
+  }
+  s += `<path class="trace" d="${path}"/>`;
+
+  document.getElementById('bode-plot').innerHTML = s;
+}
+
+function updateRC() {
+  const R = sliderToR(+document.getElementById('r-slider').value);
+  const C = sliderToC(+document.getElementById('c-slider').value);
+
+  const [rv, ru] = fmtR(R);
+  document.getElementById('r-val').textContent = rv;
+  document.getElementById('r-unit').textContent = ru;
+
+  const [cv, cu] = fmtC(C);
+  document.getElementById('c-val').textContent = cv;
+  document.getElementById('c-unit').textContent = cu;
+
+  const fc = 1 / (2 * Math.PI * R * C);
+  const [fv, fu] = fmtFreq(fc);
+  document.getElementById('fc-val').textContent = fv;
+  document.getElementById('fc-unit').textContent = fu;
+
+  const tau = R * C;
+  const [tv, tu] = fmtTau(tau);
+  document.getElementById('tau-val').textContent = tv;
+  document.getElementById('tau-unit').textContent = tu;
+
+  drawBodePlot(R, C);
+}
+
+document.getElementById('r-slider').addEventListener('input', updateRC);
+document.getElementById('c-slider').addEventListener('input', updateRC);
+
+// ============================================================================
+//  MODULE 2 · PCB TRACE CURRENT
+// ============================================================================
+let kFactor = 0.048;       // external default
+let cursorWmils = 100;     // initial probe position
+
+// t slider: 0.25 to 4 oz/ft² log scale (s=500 -> 1 oz)
+function sliderToOz(s) { return 0.25 * Math.pow(16, s/1000); }
+function ozToMils(oz)  { return oz * 1.378; }
+
+function calcCurrent(w_mils, t_mils, dT, k) {
+  const A = w_mils * t_mils;          // mil²
+  return k * Math.pow(dT, 0.44) * Math.pow(A, 0.725);
+}
+
+let pcbCtx = null; // share for click handler
+
+function drawPcbPlot(t_mils, dT, k) {
+  const wmin = 5, wmax = 500;
+  const wminLog = Math.log10(wmin);
+  const wmaxLog = Math.log10(wmax);
+  const wRange  = wmaxLog - wminLog;
+
+  // dynamic Y axis
+  const Iend = calcCurrent(wmax, t_mils, dT, k);
+  const ladders = [1, 2, 5, 10, 15, 20, 30, 50, 75, 100, 150, 200, 300, 500];
+  let yMax = ladders.find(c => c >= Iend) || Math.ceil(Iend / 100) * 100;
+
+  const xMap = w => PAD_L + (Math.log10(w) - wminLog) / wRange * (PLOT_W - PAD_L - PAD_R);
+  const yMap = I => PAD_T + (yMax - I) / yMax * (PLOT_H - PAD_T - PAD_B);
+
+  let s = '';
+
+  // x grid (log decades + minor)
+  for (let dec = Math.ceil(wminLog); dec <= Math.floor(wmaxLog); dec++) {
+    const w = Math.pow(10, dec);
+    if (w < wmin || w > wmax) continue;
+    const x = xMap(w);
+    s += `<line class="grid-line major" x1="${x}" y1="${PAD_T}" x2="${x}" y2="${PLOT_H - PAD_B}"/>`;
+    for (let m = 2; m <= 9; m++) {
+      const ww = m * w;
+      if (ww > wmin && ww < wmax) {
+        const xm = xMap(ww);
+        s += `<line class="grid-line" x1="${xm}" y1="${PAD_T}" x2="${xm}" y2="${PLOT_H - PAD_B}"/>`;
+      }
+    }
+  }
+
+  // x labels (chosen)
+  const xLabels = [5, 10, 20, 50, 100, 200, 500];
+  for (const w of xLabels) {
+    const x = xMap(w);
+    s += `<text class="axis-label" x="${x}" y="${PLOT_H - PAD_B + 16}" text-anchor="middle">${w}</text>`;
+  }
+
+  // y grid + labels
+  const steps = yMax >= 100 ? 10 : (yMax >= 30 ? 6 : 5);
+  for (let i = 0; i <= steps; i++) {
+    const I = (i * yMax) / steps;
+    const y = yMap(I);
+    const cls = (i === 0 || i === steps) ? 'major' : '';
+    s += `<line class="grid-line ${cls}" x1="${PAD_L}" y1="${y}" x2="${PLOT_W - PAD_R}" y2="${y}"/>`;
+    s += `<text class="axis-label" x="${PAD_L - 8}" y="${y + 3}" text-anchor="end">${I < 10 ? I.toFixed(1) : I.toFixed(0)}</text>`;
+  }
+
+  // border
+  s += `<rect x="${PAD_L}" y="${PAD_T}" width="${PLOT_W - PAD_L - PAD_R}" height="${PLOT_H - PAD_T - PAD_B}" fill="none" stroke="rgba(0,220,130,0.3)" stroke-width="1"/>`;
+
+  // axis titles
+  s += `<text class="axis-title" x="${PLOT_W - PAD_R}" y="${PLOT_H - 10}" text-anchor="end">WIDTH · MILS · LOG</text>`;
+  s += `<text class="axis-title" x="${PAD_L}" y="${PAD_T - 10}">CURRENT · A</text>`;
+
+  // ghost reference curves at common copper weights (subtle)
+  const refs = [
+    { oz: 0.5, color: 'rgba(255,176,0,0.10)' },
+    { oz: 1.0, color: 'rgba(255,176,0,0.10)' },
+    { oz: 2.0, color: 'rgba(255,176,0,0.10)' },
+  ];
+  for (const r of refs) {
+    const tm = ozToMils(r.oz);
+    if (Math.abs(tm - t_mils) < 0.05) continue; // skip if same as active
+    let p = '';
+    for (let i = 0; i <= 80; i++) {
+      const t = i / 80;
+      const w = Math.pow(10, wminLog + t * wRange);
+      const I = calcCurrent(w, tm, dT, k);
+      if (I > yMax) continue;
+      p += (p === '' ? 'M' : 'L') + xMap(w).toFixed(1) + ',' + yMap(I).toFixed(1) + ' ';
+    }
+    s += `<path d="${p}" fill="none" stroke="${r.color}" stroke-width="1" stroke-dasharray="2 3"/>`;
+    // small label at end of ghost curve
+    const wLabel = wmax * 0.95;
+    const Ilabel = calcCurrent(wLabel, tm, dT, k);
+    if (Ilabel <= yMax) {
+      s += `<text class="axis-label" x="${xMap(wLabel) - 4}" y="${yMap(Ilabel) - 4}" text-anchor="end" fill="rgba(255,176,0,0.35)">${r.oz} oz</text>`;
+    }
+  }
+
+  // active trace
+  const N = 400;
+  let path = '';
+  let trimStart = true;
+  for (let i = 0; i <= N; i++) {
+    const t = i / N;
+    const w = Math.pow(10, wminLog + t * wRange);
+    const I = calcCurrent(w, t_mils, dT, k);
+    if (I > yMax) continue;
+    const x = xMap(w);
+    const y = yMap(I);
+    path += (trimStart ? 'M' : 'L') + x.toFixed(1) + ',' + y.toFixed(1) + ' ';
+    trimStart = false;
+  }
+  s += `<path class="trace trace-amber" d="${path}"/>`;
+
+  // probe cursor crosshair
+  let wp = Math.max(wmin, Math.min(wmax, cursorWmils));
+  const Ip = calcCurrent(wp, t_mils, dT, k);
+  const xp = xMap(wp);
+  const yp = yMap(Math.min(Ip, yMax));
+  s += `<line class="marker-line green" x1="${xp}" y1="${PAD_T}" x2="${xp}" y2="${PLOT_H - PAD_B}" stroke="#00ff88"/>`;
+  s += `<line class="marker-line green" x1="${PAD_L}" y1="${yp}" x2="${PLOT_W - PAD_R}" y2="${yp}" stroke="#00ff88"/>`;
+  s += `<circle class="marker-dot" cx="${xp}" cy="${yp}" r="5" fill="#00ff88" style="color:#00ff88"/>`;
+
+  // floating label near cursor
+  const labelText = `${wp.toFixed(0)} mil · ${Ip.toFixed(2)} A`;
+  const labelX = xp + 10 < PLOT_W - PAD_R - 130 ? xp + 10 : xp - 10;
+  const anchor = xp + 10 < PLOT_W - PAD_R - 130 ? 'start' : 'end';
+  const labelY = yp - 12 > PAD_T + 14 ? yp - 12 : yp + 22;
+  s += `<text class="marker-label" x="${labelX}" y="${labelY}" fill="#00ff88" text-anchor="${anchor}">${labelText}</text>`;
+
+  document.getElementById('pcb-plot').innerHTML = s;
+
+  pcbCtx = { wmin, wmax, wminLog, wRange };
+}
+
+function updatePCB() {
+  const oz = sliderToOz(+document.getElementById('t-slider').value);
+  const t_mils = ozToMils(oz);
+  const um = t_mils * 25.4;
+  const dT = +document.getElementById('dt-slider').value;
+
+  document.getElementById('t-val').textContent  = oz.toFixed(2);
+  document.getElementById('t-sub').textContent  = `≈ ${t_mils.toFixed(2)} mils · ${um.toFixed(0)} µm`;
+  document.getElementById('dt-val').textContent = dT;
+
+  const I = calcCurrent(cursorWmils, t_mils, dT, kFactor);
+  const A = cursorWmils * t_mils;
+  document.getElementById('cursor-w').textContent    = cursorWmils.toFixed(0);
+  document.getElementById('cursor-w-mm').textContent = (cursorWmils * 0.0254).toFixed(2);
+  document.getElementById('i-val').textContent       = I.toFixed(2);
+  document.getElementById('a-val').textContent       = A.toFixed(0);
+
+  drawPcbPlot(t_mils, dT, kFactor);
+}
+
+document.getElementById('t-slider').addEventListener('input',  updatePCB);
+document.getElementById('dt-slider').addEventListener('input', updatePCB);
+
+document.querySelectorAll('.layer-toggle button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.layer-toggle button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    kFactor = +btn.dataset.k;
+    updatePCB();
+  });
+});
+
+// click / drag to probe
+const pcbPlot = document.getElementById('pcb-plot');
+let dragging = false;
+
+function probeAt(clientX) {
+  if (!pcbCtx) return;
+  const rect = pcbPlot.getBoundingClientRect();
+  const xRatio = (clientX - rect.left) / rect.width;
+  const xPx = xRatio * PLOT_W;
+  const t = (xPx - PAD_L) / (PLOT_W - PAD_L - PAD_R);
+  if (t < 0 || t > 1) return;
+  const w = Math.pow(10, pcbCtx.wminLog + t * pcbCtx.wRange);
+  cursorWmils = w;
+  updatePCB();
+}
+
+pcbPlot.addEventListener('mousedown', e => { dragging = true;  probeAt(e.clientX); });
+pcbPlot.addEventListener('mousemove', e => { if (dragging) probeAt(e.clientX); });
+window.addEventListener('mouseup',    () => { dragging = false; });
+pcbPlot.addEventListener('touchstart', e => { dragging = true; probeAt(e.touches[0].clientX); e.preventDefault(); }, { passive: false });
+pcbPlot.addEventListener('touchmove',  e => { if (dragging) { probeAt(e.touches[0].clientX); e.preventDefault(); } }, { passive: false });
+window.addEventListener('touchend',    () => { dragging = false; });
+
+// ============================================================================
+//  INIT
+// ============================================================================
+updateRC();
+updatePCB();
+</script>
+</body>
+</html>
