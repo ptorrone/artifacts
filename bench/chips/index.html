@@ -1,0 +1,757 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The microchip the year you were born</title>
+<style>
+/* -----------------------------------------------------------
+   adafruit playground content style
+   matched to design.md tokens
+   ----------------------------------------------------------- */
+:root {
+  --primary: #0062C7;
+  --primary-hover: #003D7B;
+  --primary-surface: #D0EFFB;
+  --ink: #333333;
+  --muted: #767676;
+  --surface: #FFFFFF;
+  --surface-alt: #F0F0F0;
+  --surface-warm: #FFFBEF;
+  --border: #DDDDDD;
+  --border-strong: #767676;
+  --success: #027D1B;
+  --warning: #F89521;
+  --danger: #D80015;
+  --yellow: #FFC700;
+  --pink: #FF00C7;
+  --purple-deep: #63338F;
+}
+
+@font-face {
+  font-family: 'Proxima Nova';
+  font-weight: 300;
+  src: local('Proxima Nova Light'), local('ProximaNova-Light');
+}
+@font-face {
+  font-family: 'Proxima Nova';
+  font-weight: 400;
+  src: local('Proxima Nova Regular'), local('ProximaNova-Regular');
+}
+@font-face {
+  font-family: 'Proxima Nova';
+  font-weight: 500;
+  src: local('Proxima Nova Semibold'), local('ProximaNova-Semibold');
+}
+@font-face {
+  font-family: 'Proxima Nova';
+  font-weight: 800;
+  src: local('Proxima Nova Bold'), local('ProximaNova-Bold');
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  font-family: 'Proxima Nova', Montserrat, 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Geneva, Verdana, sans-serif;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 1.43;
+  letter-spacing: 0.02em;
+  color: var(--ink);
+  background: var(--surface);
+}
+
+a {
+  color: var(--primary);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color 120ms ease, color 120ms ease;
+}
+a:hover {
+  color: var(--primary-hover);
+  border-bottom-color: var(--primary-hover);
+}
+
+.container {
+  max-width: 1300px;
+  margin: 0 auto;
+  padding: 40px 20px;
+}
+
+/* -----------------------------------------------------------
+   hero
+   ----------------------------------------------------------- */
+.hero {
+  padding: 64px 0 40px;
+  border-bottom: 1px solid var(--border);
+}
+.hero .eyebrow {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 15px;
+}
+.hero h1 {
+  font-size: 64px;
+  font-weight: 800;
+  line-height: 1.02;
+  margin: 0 0 20px 0;
+  letter-spacing: -0.01em;
+}
+.hero .lede {
+  font-size: 22px;
+  font-weight: 400;
+  line-height: 1.36;
+  letter-spacing: 0.02em;
+  max-width: 820px;
+  color: var(--ink);
+  margin: 0 0 15px 0;
+}
+.hero .lede.muted {
+  color: var(--muted);
+  font-size: 18px;
+}
+
+@media (max-width: 768px) {
+  .hero { padding: 40px 0 30px; }
+  .hero h1 { font-size: 40px; }
+  .hero .lede { font-size: 18px; }
+}
+
+/* -----------------------------------------------------------
+   notice banner
+   ----------------------------------------------------------- */
+.notice {
+  background: var(--surface-warm);
+  border: 1px solid var(--yellow);
+  border-radius: 14px;
+  padding: 20px;
+  margin: 40px 0;
+  display: flex;
+  gap: 15px;
+  align-items: flex-start;
+}
+.notice .icon {
+  flex: 0 0 36px;
+  font-size: 28px;
+  color: var(--muted);
+  font-weight: 800;
+  line-height: 1;
+}
+.notice h3 {
+  margin: 0 0 5px 0;
+  font-size: 21.6px;
+  font-weight: 300;
+  line-height: 0.95;
+}
+.notice p {
+  margin: 0;
+  font-size: 16px;
+  color: var(--ink);
+}
+
+/* -----------------------------------------------------------
+   year finder
+   ----------------------------------------------------------- */
+.finder {
+  margin: 40px 0;
+  padding: 30px;
+  background: var(--surface-alt);
+  border-radius: 14px;
+}
+.finder h2 {
+  margin: 0 0 20px 0;
+  font-size: 32.4px;
+  font-weight: 300;
+  line-height: 0.9;
+}
+.finder-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.finder label {
+  font-size: 18px;
+  font-weight: 400;
+  color: var(--ink);
+  margin-right: 5px;
+}
+.finder input[type="number"] {
+  height: 40px;
+  padding: 5px 10px;
+  font: inherit;
+  font-size: 18px;
+  background: var(--surface);
+  color: var(--ink);
+  border: 2px solid var(--border-strong);
+  border-radius: 4px;
+  width: 140px;
+  letter-spacing: 0.02em;
+}
+.finder input[type="number"]:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+.finder button {
+  height: 40px;
+  padding: 10px 15px;
+  font: inherit;
+  font-size: 18px;
+  font-weight: 500;
+  background: var(--primary);
+  color: var(--surface);
+  border: 2px solid var(--primary);
+  border-radius: 4px;
+  cursor: pointer;
+  letter-spacing: 0.02em;
+}
+.finder button:hover {
+  background: var(--primary-hover);
+  border-color: var(--primary-hover);
+}
+.finder .help {
+  font-size: 14px;
+  color: var(--muted);
+  margin-top: 10px;
+}
+
+/* -----------------------------------------------------------
+   decade nav
+   ----------------------------------------------------------- */
+.decades {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin: 40px 0 20px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--border);
+}
+.decade-pill {
+  display: inline-block;
+  padding: 8px 16px;
+  background: var(--surface);
+  color: var(--primary);
+  border: 2px solid var(--primary);
+  border-radius: 25px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: none;
+  letter-spacing: 0.02em;
+  transition: background 120ms, color 120ms;
+}
+.decade-pill:hover {
+  background: var(--primary);
+  color: var(--surface);
+  border-bottom: 2px solid var(--primary);
+}
+
+/* -----------------------------------------------------------
+   year cards
+   ----------------------------------------------------------- */
+.timeline { padding-bottom: 40px; }
+.timeline > h2 {
+  font-size: 36px;
+  font-weight: 300;
+  line-height: 0.9;
+  margin: 40px 0 30px;
+}
+
+.year-card {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 30px;
+  padding: 30px 0;
+  border-bottom: 1px solid var(--border);
+  scroll-margin-top: 30px;
+  transition: background 600ms ease;
+}
+.year-card.flash { background: var(--primary-surface); }
+
+.year-number {
+  font-size: 64px;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--primary);
+  letter-spacing: -0.02em;
+}
+.year-anchor {
+  display: block;
+  height: 0;
+  margin-top: -20px;
+  padding-top: 20px;
+  pointer-events: none;
+}
+.chip-info { padding-top: 8px; }
+.chip-tag {
+  display: inline-block;
+  padding: 2px 10px;
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  background: var(--primary-surface);
+  color: var(--primary-hover);
+  border-radius: 4px;
+  margin-bottom: 10px;
+}
+.chip-tag.gpu { background: #F4E5FF; color: var(--purple-deep); }
+.chip-tag.mcu { background: #D7F4DC; color: var(--success); }
+.chip-tag.mem { background: #FFF1D2; color: #8A5A00; }
+.chip-tag.logic { background: var(--surface-alt); color: var(--ink); }
+.chip-tag.opamp { background: #FFE3F8; color: #A1006B; }
+
+.chip-name {
+  font-size: 36px;
+  font-weight: 300;
+  line-height: 0.95;
+  margin: 0 0 10px 0;
+  color: var(--ink);
+}
+.chip-meta {
+  font-size: 14px;
+  color: var(--muted);
+  margin: 0 0 15px 0;
+  letter-spacing: 0.02em;
+}
+.chip-desc {
+  font-size: 18px;
+  line-height: 1.43;
+  margin: 0 0 15px 0;
+  max-width: 820px;
+}
+.powered {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 15px 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.powered li {
+  background: var(--surface-alt);
+  color: var(--ink);
+  font-size: 14px;
+  padding: 4px 10px;
+  border-radius: 4px;
+  letter-spacing: 0.02em;
+}
+.source-link {
+  font-size: 14px;
+  color: var(--primary);
+}
+
+@media (max-width: 768px) {
+  .year-card {
+    grid-template-columns: 1fr;
+    gap: 10px;
+    padding: 30px 0;
+  }
+  .year-number { font-size: 48px; }
+  .chip-name { font-size: 28px; }
+}
+
+/* -----------------------------------------------------------
+   spotlight (selected year)
+   ----------------------------------------------------------- */
+.spotlight {
+  margin-top: 25px;
+  padding: 25px;
+  background: var(--surface);
+  border: 2px solid var(--primary);
+  border-radius: 14px;
+  display: none;
+}
+.spotlight.show { display: block; }
+.spotlight .year-card {
+  border-bottom: none;
+  padding: 0;
+}
+.spotlight .chip-name { color: var(--primary); }
+
+/* -----------------------------------------------------------
+   adafruit gear / play with these chips today
+   ----------------------------------------------------------- */
+.gear {
+  margin: 64px 0 40px;
+  padding: 40px 0 0;
+  border-top: 1px solid var(--border);
+}
+.gear h2 {
+  font-size: 36px;
+  font-weight: 300;
+  line-height: 0.9;
+  margin: 0 0 15px;
+}
+.gear .lede {
+  font-size: 18px;
+  color: var(--ink);
+  max-width: 820px;
+  margin: 0 0 30px 0;
+}
+.gear-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+.gear-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  transition: border-color 120ms ease;
+}
+.gear-card:hover { border-color: var(--primary); }
+.gear-card .chip-key {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 500;
+  color: var(--primary);
+  margin-bottom: 10px;
+}
+.gear-card h3 {
+  font-size: 21.6px;
+  font-weight: 300;
+  line-height: 1.05;
+  margin: 0 0 10px 0;
+  color: var(--ink);
+}
+.gear-card p {
+  font-size: 16px;
+  color: var(--ink);
+  margin: 0 0 15px 0;
+  flex: 1;
+}
+.gear-card .gear-link {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--primary);
+}
+
+/* -----------------------------------------------------------
+   sources & footer
+   ----------------------------------------------------------- */
+.sources {
+  margin-top: 64px;
+  padding: 30px;
+  background: var(--surface-alt);
+  border-radius: 14px;
+}
+.sources h2 {
+  font-size: 28.8px;
+  font-weight: 300;
+  line-height: 0.9;
+  margin: 0 0 15px;
+}
+.sources ul {
+  margin: 0;
+  padding-left: 20px;
+}
+.sources li {
+  margin-bottom: 8px;
+  font-size: 16px;
+}
+.sources li a { word-break: break-word; }
+
+.colophon {
+  margin: 40px 0 64px;
+  font-size: 14px;
+  color: var(--muted);
+  letter-spacing: 0.02em;
+}
+.colophon p { margin: 0 0 8px 0; }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <header class="hero">
+    <div class="eyebrow">a playground note · timeline · 1965 to 2026</div>
+    <h1>the microchip the year you were born</h1>
+    <p class="lede">business insider runs an annual best-selling-album list... we built the version for the rest of us. one chip per year, from the apollo guidance computer through the rubin AI platform. the chips that defined the year, not always the highest-grossing... global per-chip sales rankings don't exist for every year, so this is the chip you'd point to in a textbook, a museum, or a maker's parts bin.</p>
+    <p class="lede muted">scroll the full timeline, jump to your birth year, or punch a year into the finder below. at the bottom: where to play with these chip lineages today, and every source we used.</p>
+  </header>
+
+  <div class="notice">
+    <div class="icon">i</div>
+    <div>
+      <h3>a note on the methodology</h3>
+      <p>"best-selling" microchips don't get a billboard chart. semiconductor unit volumes are private, fragmented across foundries, and most chips are sold in tiny quantities to industrial buyers. so we picked the chip each year that historians, engineers, and makers would reach for as the year's defining part. early years lean industrial and computing... the modern era leans toward maker silicon, because that's the lineage adafruit cares about most. for the contested years (you can argue all of them) the source link explains the call.</p>
+    </div>
+  </div>
+
+  <section class="finder">
+    <h2>find your chip</h2>
+    <div class="finder-row">
+      <label for="year-input">enter a year (1965 to 2026):</label>
+      <input type="number" id="year-input" min="1965" max="2026" placeholder="e.g. 1981">
+      <button id="find-btn">find it</button>
+    </div>
+    <div class="help">we'll scroll you to that year's card and highlight it. or click any decade pill below to jump.</div>
+    <div class="spotlight" id="spotlight" aria-live="polite"></div>
+  </section>
+
+  <nav class="decades" aria-label="jump to decade">
+    <a class="decade-pill" href="#y1965">1960s</a>
+    <a class="decade-pill" href="#y1970">1970s</a>
+    <a class="decade-pill" href="#y1980">1980s</a>
+    <a class="decade-pill" href="#y1990">1990s</a>
+    <a class="decade-pill" href="#y2000">2000s</a>
+    <a class="decade-pill" href="#y2010">2010s</a>
+    <a class="decade-pill" href="#y2020">2020s</a>
+  </nav>
+
+  <section class="timeline" id="timeline">
+    <h2>the full timeline</h2>
+    <div id="years"></div>
+  </section>
+
+  <section class="gear">
+    <h2>play with these chip lineages today</h2>
+    <p class="lede">a lot of these chips are dead silicon you can only find on ebay or in a museum. some are still in active production fifty-plus years later. and a few are the working heart of every adafruit board on a workbench right now. here's where the maker-side chips on this timeline are still alive... no checkout flow, just the lineage. each line links to the relevant adafruit learn guide so you can read first, buy second.</p>
+    <div class="gear-grid">
+
+      <article class="gear-card">
+        <div class="chip-key">ATmega328P · 2008–present</div>
+        <h3>Adafruit Metro 328</h3>
+        <p>the arduino uno's chip in adafruit's metro form factor. still the cleanest way to learn embedded c on the chip that lit the maker movement.</p>
+        <a class="gear-link" href="https://learn.adafruit.com/adafruit-metro/overview">learn guide → adafruit metro overview</a>
+      </article>
+
+      <article class="gear-card">
+        <div class="chip-key">SAMD51 · ARM Cortex-M4F</div>
+        <h3>Metro M4 Express</h3>
+        <p>the post-AVR step up. 120 MHz cortex-M4F, hardware float, runs circuitpython natively. this is the chip that bridged 8-bit nostalgia and 32-bit reality for a lot of makers.</p>
+        <a class="gear-link" href="https://learn.adafruit.com/adafruit-metro-m4-express-featuring-atsamd51">learn guide → metro m4 express</a>
+      </article>
+
+      <article class="gear-card">
+        <div class="chip-key">RP2040 · 2021</div>
+        <h3>Feather RP2040 / KB2040 / QT Py RP2040</h3>
+        <p>raspberry pi's first microcontroller. dual cortex-M0+ at 133 MHz, eight programmable I/O state machines that act like tiny FPGAs. adafruit ships it in feather, kee-boar, and qt-py form factors so you can use the same chip from breadboard to keyboard build.</p>
+        <a class="gear-link" href="https://learn.adafruit.com/adafruit-feather-rp2040-pico">learn guide → feather rp2040</a>
+      </article>
+
+      <article class="gear-card">
+        <div class="chip-key">RP2350 · 2024</div>
+        <h3>Metro RP2350 / Feather RP2350</h3>
+        <p>the second-gen pi silicon. dual ARM cortex-M33 plus dual hazard3 RISC-V cores you can hot-swap between, hardware secure boot, more PIO state machines. the first microcontroller most makers will own that has both ARM and RISC-V on the same die.</p>
+        <a class="gear-link" href="https://learn.adafruit.com/adafruit-metro-rp2350">learn guide → metro rp2350</a>
+      </article>
+
+      <article class="gear-card">
+        <div class="chip-key">ESP32-S3 · 2021</div>
+        <h3>Feather ESP32-S3 / QT Py ESP32-S3</h3>
+        <p>espressif's AIoT chip. dual xtensa LX7 at 240 MHz with vector instructions for on-device ML, wi-fi plus bluetooth 5 LE, native USB. if your project needs to talk to the internet and run a small neural net, this is the chip.</p>
+        <a class="gear-link" href="https://learn.adafruit.com/adafruit-esp32-s3-feather">learn guide → feather esp32-s3</a>
+      </article>
+
+      <article class="gear-card">
+        <div class="chip-key">nRF52840 · 2018</div>
+        <h3>Feather nRF52840 Sense</h3>
+        <p>nordic's bluetooth low energy workhorse. ARM cortex-M4F, BLE 5, thread, zigbee, on-chip USB. the sense variant adds a stack of motion, light, and environmental sensors. matter-over-thread maker projects live here.</p>
+        <a class="gear-link" href="https://learn.adafruit.com/adafruit-feather-sense">learn guide → feather sense</a>
+      </article>
+
+    </div>
+  </section>
+
+  <section class="sources">
+    <h2>sources</h2>
+    <ul>
+      <li>computer history museum, integrated circuit timeline ... <a href="https://www.computerhistory.org/revolution/digital-logic/12/">computerhistory.org/revolution/digital-logic</a></li>
+      <li>IEEE spectrum, chip hall of fame series ... <a href="https://spectrum.ieee.org/chip-hall-of-fame">spectrum.ieee.org/chip-hall-of-fame</a></li>
+      <li>ken shirriff, righto.com (chip die photography and reverse engineering) ... <a href="https://www.righto.com/">righto.com</a></li>
+      <li>intel chronological history of microprocessors ... <a href="https://www.intel.com/content/www/us/en/history/museum-story-of-intel-4004.html">intel 4004 museum entry</a></li>
+      <li>raspberry pi pico 2 / RP2350 launch (8 august 2024) ... <a href="https://www.raspberrypi.com/news/raspberry-pi-pico-2-our-new-5-microcontroller-board-on-sale-now/">raspberrypi.com/news</a></li>
+      <li>espressif ESP32-S3 announcement and product page ... <a href="https://www.espressif.com/en/news/ESP32_S3">espressif.com/en/news/ESP32_S3</a></li>
+      <li>NVIDIA rubin platform launch, CES 2026 ... <a href="https://nvidianews.nvidia.com/news/rubin-platform-ai-supercomputer">nvidianews.nvidia.com/news/rubin-platform-ai-supercomputer</a></li>
+      <li>NVIDIA blackwell platform announcement, GTC 2024 ... <a href="https://nvidianews.nvidia.com/news/nvidia-blackwell-platform-arrives-to-power-a-new-era-of-computing">nvidianews.nvidia.com</a></li>
+      <li>microchip PIC16F84 datasheet history ... <a href="https://www.microchip.com/en-us/product/pic16f84a">microchip.com</a></li>
+      <li>nordic nRF52840 product page ... <a href="https://www.nordicsemi.com/Products/nRF52840">nordicsemi.com</a></li>
+      <li>fairchild µA741 chip hall of fame entry, IEEE spectrum ... <a href="https://spectrum.ieee.org/chip-hall-of-fame-fairchild-semiconductor-a741-opamp">spectrum.ieee.org/chip-hall-of-fame-fairchild-semiconductor-a741-opamp</a></li>
+      <li>wikipedia chip articles cross-referenced for launch dates and architectures ... <a href="https://en.wikipedia.org/wiki/List_of_Intel_microprocessors">en.wikipedia.org/wiki/list_of_intel_microprocessors</a></li>
+      <li>jeff geerling, RP2350 hands-on coverage ... <a href="https://www.jeffgeerling.com/blog/2024/raspberry-pi-pico-2-rp2350-adds-more-pio-risc-v-cores">jeffgeerling.com</a></li>
+      <li>hackaday's part-day archive (espressif, raspberry pi, microchip launch coverage) ... <a href="https://hackaday.com/category/parts/">hackaday.com/category/parts</a></li>
+      <li>adafruit learning system, board overview pages cited per product ... <a href="https://learn.adafruit.com/">learn.adafruit.com</a></li>
+    </ul>
+  </section>
+
+  <div class="colophon">
+    <p>compiled april 2026 ... CC BY-SA 4.0 ... corrections welcome on the adafruit playground note this guide was published as.</p>
+    <p>missing a year you'd argue for? sources for this kind of historical work always have gaps. add yours in the comments and we'll roll the next pass.</p>
+  </div>
+
+</div>
+
+<script>
+// data: 1965 to 2026
+const YEARS = [
+  {year:1965,name:"Fairchild Micrologic µL914",mfr:"Fairchild Semiconductor",type:"logic",label:"RTL NOR gate",desc:"the apollo guidance computer flew to the moon on these. fairchild's micrologic family was the first widely-deployed integrated logic, dual-NOR gates that NASA bought by the thousand. moore's law was published the same year.",powered:["Apollo Guidance Computer","Minuteman II missile guidance"],src:"https://www.computerhistory.org/revolution/digital-logic/12/253"},
+  {year:1966,name:"Texas Instruments SN7400",mfr:"Texas Instruments",type:"logic",label:"TTL quad NAND",desc:"TI's SN7400 series turned digital design into a parts catalog. quad NAND gate, ceramic DIP, the first chip in the 7400 family that would become the lingua franca of digital electronics for the next 30 years.",powered:["mainframe logic","minicomputer CPUs","every EE lab bench since"],src:"https://www.ti.com/product/SN7400"},
+  {year:1967,name:"Texas Instruments TTL 7400 family",mfr:"Texas Instruments",type:"logic",label:"TTL family expansion",desc:"by 1967 the 7400 line had ballooned past the original NAND into flip-flops, counters, decoders, and shift registers. if you built a digital anything between 1967 and the rise of the microprocessor, you wired up some of these.",powered:["DEC PDP-11","Data General Nova","HP minicomputers"],src:"https://en.wikipedia.org/wiki/7400-series_integrated_circuits"},
+  {year:1968,name:"Fairchild µA741",mfr:"Fairchild Semiconductor",type:"opamp",label:"operational amplifier",desc:"dave fullagar at fairchild added an on-die compensation capacitor to the op-amp recipe and accidentally made the most popular analog IC in history. still in production today. still in your textbook. still on adafruit's shelf.",powered:["audio gear","industrial control","every analog electronics class ever"],src:"https://spectrum.ieee.org/chip-hall-of-fame-fairchild-semiconductor-a741-opamp"},
+  {year:1969,name:"Intel 3101",mfr:"Intel",type:"mem",label:"64-bit bipolar SRAM",desc:"intel's first product. 64 bits of bipolar static RAM. tiny by any measure ... but it's the chip that paid for the company that would build the 4004 two years later.",powered:["minicomputer scratchpad memory","early calculator buffers"],src:"https://www.computerhistory.org/siliconengine/intels-first-product-the-3101-schottky-bipolar-64-bit-static-random-access-memory/"},
+  {year:1970,name:"Intel 1103",mfr:"Intel",type:"mem",label:"1 Kb DRAM",desc:"the chip that killed magnetic core memory. one kilobit of dynamic RAM on a single die at a price core couldn't touch. by 1972 it was the best-selling memory chip in the world.",powered:["DEC PDP-11","HP 9800 series","mainframe main memory"],src:"https://www.computerhistory.org/siliconengine/the-intel-1103-the-first-significant-commercial-dram/"},
+  {year:1971,name:"Intel 4004",mfr:"Intel",type:"cpu",label:"4-bit microprocessor",desc:"the first commercial microprocessor. designed for a busicom calculator, but federico faggin and ted hoff knew immediately what they had. 2,300 transistors, 740 kHz, an entire CPU on one chip.",powered:["Busicom 141-PF calculator","traffic lights","blood analyzers"],src:"https://www.intel.com/content/www/us/en/history/museum-story-of-intel-4004.html"},
+  {year:1972,name:"Intel 8008",mfr:"Intel",type:"cpu",label:"8-bit microprocessor",desc:"the 4004's bigger sibling. 8-bit data, 14-bit address space, the first real general-purpose microprocessor. you could build a terminal or a small computer around it ... and people did.",powered:["Datapoint 2200 alternative","Mark-8 hobby computer (1974)","industrial controllers"],src:"https://en.wikipedia.org/wiki/Intel_8008"},
+  {year:1973,name:"Texas Instruments TMS0100",mfr:"Texas Instruments",type:"cpu",label:"calculator-on-a-chip",desc:"the year of the pocket calculator. TI's TMS0100 family was a calculator on a single chip, sold in volumes that dwarfed every microprocessor combined. 1973 was when 'a chip in your pocket' became a household idea.",powered:["TI Datamath","Sinclair Cambridge","drugstore calculators by the millions"],src:"https://en.wikipedia.org/wiki/TMS1000"},
+  {year:1974,name:"Intel 8080",mfr:"Intel",type:"cpu",label:"8-bit microprocessor",desc:"the chip that started personal computing. 2 MHz, 6,000 transistors, the brains of the altair 8800 and every CP/M machine that followed. without the 8080 there's no 8086, no x86, no PC.",powered:["MITS Altair 8800","IMSAI 8080","every CP/M machine"],src:"https://en.wikipedia.org/wiki/Intel_8080"},
+  {year:1975,name:"MOS Technology 6502",mfr:"MOS Technology",type:"cpu",label:"8-bit microprocessor",desc:"chuck peddle's $25 microprocessor blew up the industry. one-tenth the price of an 8080 with comparable performance. it would end up in apple, atari, commodore, nintendo, and bbc machines ... arguably the most influential chip of the 8-bit era.",powered:["Apple I & II","Commodore PET","Atari 2600","NES (Ricoh 2A03 variant)"],src:"https://en.wikipedia.org/wiki/MOS_Technology_6502"},
+  {year:1976,name:"Zilog Z80",mfr:"Zilog",type:"cpu",label:"8-bit microprocessor",desc:"federico faggin left intel and built the chip he wished the 8080 had been. 8080-compatible, single 5V supply, more registers, more instructions. the Z80 would dominate CP/M, the ZX spectrum, the trs-80, and arcade hardware.",powered:["TRS-80","ZX Spectrum","Pac-Man arcade","Game Boy (Z80-derived)"],src:"https://en.wikipedia.org/wiki/Zilog_Z80"},
+  {year:1977,name:"MOS 6502 (Apple II / PET / Atari)",mfr:"MOS Technology",type:"cpu",label:"8-bit microprocessor",desc:"the trinity of 1977 personal computers ... apple II, commodore PET, tandy TRS-80 ... shipped with 6502s and Z80s. for most kids who'd grow up to be adafruit customers, this was the chip that made a screen do what they told it to.",powered:["Apple II","Commodore PET","Atari 800"],src:"https://en.wikipedia.org/wiki/Apple_II"},
+  {year:1978,name:"Intel 8086",mfr:"Intel",type:"cpu",label:"16-bit microprocessor",desc:"the first x86. 16-bit, 29,000 transistors, the architectural ancestor of every desktop and server CPU you've ever used. didn't sell as well as its cheaper 8088 sibling at first ... that came in 1981.",powered:["IBM Displaywriter","Compaq Deskpro 386 (later)","x86 lineage forever"],src:"https://en.wikipedia.org/wiki/Intel_8086"},
+  {year:1979,name:"Motorola 68000",mfr:"Motorola",type:"cpu",label:"16/32-bit microprocessor",desc:"a 32-bit register set in a 16-bit data bus package. cleaner architecture than the 8086, beloved by engineers. it would power the original macintosh, the amiga, the atari ST, and a generation of arcade machines.",powered:["Apple Lisa & Macintosh","Commodore Amiga","Atari ST","Sega Genesis"],src:"https://en.wikipedia.org/wiki/Motorola_68000"},
+  {year:1980,name:"Intel 8088",mfr:"Intel",type:"cpu",label:"8/16-bit microprocessor",desc:"the 8086 with an 8-bit data bus. cheaper, slower, but compatible with the cheap 8-bit support chips of the era. IBM's PC engineers picked it for the original IBM PC, finalized in 1980 ... a decision that would set the course of the next 40 years.",powered:["IBM PC (1981)","IBM PC XT","first-generation clones"],src:"https://en.wikipedia.org/wiki/Intel_8088"},
+  {year:1981,name:"Intel 8088 (in IBM PC)",mfr:"Intel",type:"cpu",label:"8/16-bit microprocessor",desc:"the IBM PC shipped 12 august 1981. the 8088 inside it would, by accident of standards, become the seed of every PC clone ever made. apple ][, commodore 64, and atari 800 still outsold it ... but the architectural die was cast.",powered:["IBM PC (model 5150)","first PC clones"],src:"https://www.computerhistory.org/timeline/1981/"},
+  {year:1982,name:"Intel 80286",mfr:"Intel",type:"cpu",label:"16-bit microprocessor",desc:"the chip that put an MMU and protected mode into x86. the 286 ran the IBM PC AT and the entire late-80s business computer wave. bill gates famously called it 'brain dead' for its mode-switching limits ... it sold over 15 million units anyway.",powered:["IBM PC AT","Compaq Deskpro 286","every clone vendor's flagship"],src:"https://en.wikipedia.org/wiki/Intel_80286"},
+  {year:1983,name:"MOS 6510 (Commodore 64)",mfr:"MOS Technology",type:"cpu",label:"8-bit microprocessor",desc:"the C64 was the year's defining personal computer. its 6510 was a 6502 variant with a built-in I/O port. commodore would ship roughly 17 million C64s ... the best-selling single computer model of all time.",powered:["Commodore 64","Commodore 1541 disk drive (companion 6502)"],src:"https://en.wikipedia.org/wiki/Commodore_64"},
+  {year:1984,name:"Motorola 68000 (Macintosh)",mfr:"Motorola",type:"cpu",label:"16/32-bit microprocessor",desc:"the original macintosh shipped 24 january 1984 with an 8 MHz 68000. apple, atari, and commodore amiga all built their flagships on the 68k. the platform war between 68000 (clean, register-heavy) and x86 (messy, ubiquitous) defined the decade.",powered:["Apple Macintosh","Atari ST","Amiga 1000","Sun-1 workstation"],src:"https://en.wikipedia.org/wiki/Macintosh_128K"},
+  {year:1985,name:"Intel 80386",mfr:"Intel",type:"cpu",label:"32-bit microprocessor",desc:"the first true 32-bit x86. flat memory model, hardware paging, virtual 8086 mode. compaq, not IBM, shipped the first 386 PC ... the moment the clones outpaced the founder. 386 architecture is still the foundation of every modern x86 CPU.",powered:["Compaq Deskpro 386","IBM PS/2","early unix workstations"],src:"https://en.wikipedia.org/wiki/Intel_80386"},
+  {year:1986,name:"Intel 80386 (volume ramp)",mfr:"Intel",type:"cpu",label:"32-bit microprocessor",desc:"by 1986 the 386 was shipping in real volume. compaq's lead pushed IBM into the PS/2 line and broke the IBM-defines-the-standard era for good. windows 3.0 was being designed around its capabilities.",powered:["IBM PS/2","Compaq portable III","early unix-on-PC ports"],src:"https://www.computerhistory.org/timeline/1986/"},
+  {year:1987,name:"Acorn ARM2",mfr:"Acorn Computers",type:"cpu",label:"32-bit RISC microprocessor",desc:"twelve engineers in cambridge, england designed a 32-bit RISC chip with 27,000 transistors that ran cooler than a thermometer. nobody noticed at the time. by 2026, ARM cores would ship in over 250 billion devices ... more than any other CPU architecture.",powered:["Acorn Archimedes A305","every smartphone, eventually"],src:"https://en.wikipedia.org/wiki/Acorn_Archimedes"},
+  {year:1988,name:"Intel 80386SX",mfr:"Intel",type:"cpu",label:"32-bit microprocessor",desc:"the 386's mass-market variant. same 32-bit core, half-width 16-bit external bus, fits in a cheaper motherboard. this is the chip that put 32-bit windows-class machines onto millions of office desks.",powered:["Tandy 4000 SX","Compaq Deskpro 386s","entry-level clones"],src:"https://en.wikipedia.org/wiki/Intel_80386#80386SX"},
+  {year:1989,name:"Intel 80486",mfr:"Intel",type:"cpu",label:"32-bit microprocessor",desc:"first x86 with an integrated FPU and on-die L1 cache. 1.2 million transistors, the most complex chip intel had ever shipped. the 486 was the windows-95-anticipating workhorse of the early 90s.",powered:["IBM PS/2 model 90","Dell PowerLine","every business PC for half a decade"],src:"https://en.wikipedia.org/wiki/Intel_80486"},
+  {year:1990,name:"Motorola 68030",mfr:"Motorola",type:"cpu",label:"32-bit microprocessor",desc:"the 68000 line's full 32-bit refit ... on-chip MMU, demand-paged virtual memory, the foundation of macintosh II and NeXT. the 68k was still apple's chip until the powerpc transition in 1994.",powered:["Macintosh IIci","NeXTcube","Amiga 3000"],src:"https://en.wikipedia.org/wiki/Motorola_68030"},
+  {year:1991,name:"AMD Am386",mfr:"AMD",type:"cpu",label:"32-bit microprocessor",desc:"AMD reverse-engineered the 386 and shipped a clone. intel sued. AMD eventually won. the legal precedent broke intel's monopoly on x86 and is the reason there's still competition in CPUs today.",powered:["Compaq budget desktops","every cost-conscious PC OEM"],src:"https://en.wikipedia.org/wiki/AMD_Am386"},
+  {year:1992,name:"Intel 486DX2",mfr:"Intel",type:"cpu",label:"32-bit microprocessor",desc:"clock-doubling. the CPU runs at 50 or 66 MHz internally on a 25 or 33 MHz bus. cheap motherboards, fast chips ... the formula that defined upgrade culture for the rest of the decade.",powered:["IBM ValuePoint","Gateway 2000 desktops","huge upgrade aftermarket"],src:"https://en.wikipedia.org/wiki/Intel_DX2"},
+  {year:1993,name:"Intel Pentium",mfr:"Intel",type:"cpu",label:"32-bit superscalar",desc:"intel skipped the '586' name and trademarked 'pentium' instead. superscalar (two pipelines), 3.1 million transistors, 60-66 MHz at launch. famously shipped with the FDIV bug ... famously corrected with a recall that cost intel $475 million.",powered:["pentium-class PCs","windows 95 baseline"],src:"https://en.wikipedia.org/wiki/Pentium_(original)"},
+  {year:1994,name:"PowerPC 601",mfr:"IBM/Motorola/Apple",type:"cpu",label:"32-bit RISC",desc:"the AIM alliance's answer to intel. apple shipped power macintosh 6100/7100/8100 in march 1994 ... the 68k era was over. the 601 was a hybrid POWER-derived RISC chip, the first PowerPC mac.",powered:["Power Macintosh 6100","IBM RS/6000","early PReP machines"],src:"https://en.wikipedia.org/wiki/PowerPC_600"},
+  {year:1995,name:"Intel Pentium Pro",mfr:"Intel",type:"cpu",label:"32-bit out-of-order",desc:"the chip that taught x86 how to do out-of-order execution. P6 microarchitecture lived for over a decade afterward, all the way through pentium III and the early core duos. 5.5 million transistors and an on-package L2 cache.",powered:["windows NT workstations","early server farms","Deep Blue (chess machine)"],src:"https://en.wikipedia.org/wiki/Pentium_Pro"},
+  {year:1996,name:"Microchip PIC16F84",mfr:"Microchip Technology",type:"mcu",label:"8-bit flash microcontroller",desc:"the chip that made hobby microcontrollers a thing. 1k of flash, 68 bytes of RAM, an 18-pin DIP that hobbyists could program with a parallel port and a few diodes. for ten years before arduino, the PIC16F84 was the maker microcontroller.",powered:["thousands of hobby projects","BASIC stamp predecessors","early robotics kits"],src:"https://www.microchip.com/en-us/product/pic16f84a"},
+  {year:1997,name:"Intel Pentium II",mfr:"Intel",type:"cpu",label:"32-bit microprocessor",desc:"P6 microarchitecture, MMX SIMD, 7.5 million transistors, the slot 1 cartridge with on-cartridge L2 cache. 233-450 MHz. this is the chip that ran windows 98 and most home PCs from 1997 to 2000.",powered:["windows 98 home PCs","compaq presario","gateway G6"],src:"https://en.wikipedia.org/wiki/Pentium_II"},
+  {year:1998,name:"AMD K6-2",mfr:"AMD",type:"cpu",label:"32-bit microprocessor",desc:"AMD finally shipped a chip that could keep up with intel's pentium II at the low end ... at half the price. 3DNow! SIMD, super-socket-7 motherboards, the budget-builder's hero through 1999.",powered:["compaq presario budget tier","emachines","DIY PC builds"],src:"https://en.wikipedia.org/wiki/AMD_K6-2"},
+  {year:1999,name:"AMD Athlon",mfr:"AMD",type:"cpu",label:"32-bit microprocessor",desc:"AMD's clean-sheet K7 architecture beat intel to 1 GHz in march 2000. the athlon was the first AMD chip that genuinely embarrassed intel on performance. it broke the 'AMD = budget compromise' assumption permanently.",powered:["DIY enthusiast PCs","first 1 GHz desktop","compaq presario performance line"],src:"https://en.wikipedia.org/wiki/Athlon"},
+  {year:2000,name:"Intel Pentium III (Coppermine)",mfr:"Intel",type:"cpu",label:"32-bit microprocessor",desc:"the .18-micron coppermine pentium III with on-die L2. intel hit 1 GHz in march 2000, eight days after AMD. SSE SIMD instructions debuted here ... still in use a quarter-century later.",powered:["dell dimension","apple xserve (briefly)","windows 2000 workstations"],src:"https://en.wikipedia.org/wiki/Pentium_III"},
+  {year:2001,name:"Intel Pentium 4 (Willamette)",mfr:"Intel",type:"cpu",label:"32-bit netburst",desc:"netburst microarchitecture. very deep pipelines, very high clocks, very hot. famously hit a thermal wall at 3.8 GHz that ended intel's 'GHz uber alles' strategy. the chip that taught the industry to stop chasing clock speed.",powered:["dell dimension","emachines T-series","windows XP launch PCs"],src:"https://en.wikipedia.org/wiki/Pentium_4"},
+  {year:2002,name:"ARM7TDMI",mfr:"ARM",type:"cpu",label:"32-bit RISC core",desc:"by 2002 the ARM7TDMI was the most-licensed CPU core on earth. nintendo gameboy advance, the original iPod, ericsson and nokia phones, every embedded thing. ARM took over mobile while x86 wasn't looking.",powered:["iPod (1st gen)","Game Boy Advance","Nokia 6610","millions of feature phones"],src:"https://en.wikipedia.org/wiki/ARM7"},
+  {year:2003,name:"AMD Athlon 64",mfr:"AMD",type:"cpu",label:"64-bit x86",desc:"the first 64-bit x86 chip. AMD's amd64 instruction set extension would, two years later, be adopted by intel as 'EM64T' (later intel 64). every 64-bit windows, mac, and linux x86 PC since runs on what AMD designed.",powered:["AMD athlon 64 X2","early opteron servers","windows XP x64"],src:"https://en.wikipedia.org/wiki/Athlon_64"},
+  {year:2004,name:"Intel Pentium M (Centrino)",mfr:"Intel",type:"cpu",label:"32-bit microprocessor",desc:"intel's israel team built a P6-derived low-power chip for laptops. the pentium M would directly become core, then core 2 ... the family that finally killed netburst. centrino is the moment laptops stopped being desktops with batteries.",powered:["IBM thinkpad T40","apple powerbook (briefly via emulation)","sony VAIO laptops"],src:"https://en.wikipedia.org/wiki/Pentium_M"},
+  {year:2005,name:"Cell Broadband Engine",mfr:"IBM/Sony/Toshiba",type:"cpu",label:"heterogeneous multicore",desc:"a PowerPC core plus eight SPE vector co-processors on one die. shipped in the playstation 3 (2006) and powered the world's fastest supercomputer (roadrunner) in 2008. wildly ambitious. mostly impossible to program. exactly the year's defining chip.",powered:["PlayStation 3","IBM Roadrunner supercomputer","PS3 linux experiments"],src:"https://en.wikipedia.org/wiki/Cell_(processor)"},
+  {year:2006,name:"Intel Core 2 Duo (Conroe)",mfr:"Intel",type:"cpu",label:"64-bit dual-core",desc:"intel's core microarchitecture, derived from the pentium M. dual-core, 64-bit, sane power envelope ... the chip that won back the performance crown from AMD and powered apple's intel transition (january 2006).",powered:["MacBook Pro (1st gen intel)","Mac Pro (1st gen)","every PC OEM's flagship"],src:"https://en.wikipedia.org/wiki/Intel_Core_2"},
+  {year:2007,name:"Apple S5L8900 (ARM11)",mfr:"Samsung / Apple",type:"cpu",label:"32-bit ARM SoC",desc:"the original iphone shipped 29 june 2007 with a samsung-fab'd ARM11 SoC running at 412 MHz. the iphone made the 'apps on a phone with a touchscreen' platform inevitable. ARM in your pocket, forever.",powered:["iPhone (1st gen)","iPod touch (1st gen)"],src:"https://en.wikipedia.org/wiki/Apple_silicon"},
+  {year:2008,name:"Atmel ATmega168 / ATmega328",mfr:"Atmel",type:"mcu",label:"8-bit AVR microcontroller",desc:"the arduino diecimila and duemilanove shipped with the ATmega168 (later 328) ... 16k or 32k of flash, hardware serial, ten or so I/O pins for $5. arduino sold the chip's friendliness more than the chip itself, but the chip is what was actually under the hood.",powered:["Arduino Diecimila","Arduino Duemilanove","early hobby robotics"],src:"https://www.microchip.com/en-us/product/ATmega328P"},
+  {year:2009,name:"Atmel ATmega328P",mfr:"Atmel",type:"mcu",label:"8-bit AVR microcontroller",desc:"the arduino uno launched in 2010 with the ATmega328P. the part was already shipping in volume in 2009 across earlier arduino variants and clones. it became the gateway drug to embedded programming for an entire generation of makers.",powered:["Arduino Uno","Adafruit Metro 328","every arduino clone"],src:"https://store.arduino.cc/products/arduino-uno-rev3"},
+  {year:2010,name:"Apple A4",mfr:"Apple / Samsung",type:"cpu",label:"32-bit ARM SoC",desc:"apple's first own-branded SoC. ARM cortex-A8 + powerVR GPU on a 45nm samsung process. shipped in the iPad (april 2010) and iPhone 4 (june 2010). the start of apple silicon as a strategic asset.",powered:["iPad (1st gen)","iPhone 4","Apple TV (2nd gen)"],src:"https://en.wikipedia.org/wiki/Apple_A4"},
+  {year:2011,name:"ARM Cortex-A9 (smartphones)",mfr:"ARM",type:"cpu",label:"32-bit ARM core",desc:"by 2011 the cortex-A9 was running every flagship android (samsung galaxy S II, motorola atrix) and apple's A5 (in iPhone 4S, ipad 2). the era of dual-core mobile silicon. ARM had quietly become the world's dominant CPU architecture by unit count.",powered:["iPhone 4S","Samsung Galaxy S II","Nintendo 3DS"],src:"https://en.wikipedia.org/wiki/ARM_Cortex-A9"},
+  {year:2012,name:"Broadcom BCM2835",mfr:"Broadcom",type:"cpu",label:"ARM11 SoC + VideoCore IV",desc:"the raspberry pi shipped 29 february 2012. ARM11 at 700 MHz, videocore IV GPU, 256 MB of RAM, $35. nobody at broadcom built it for hobbyists ... they sold it to the pi foundation as a one-off. the foundation built one of the most influential maker platforms of all time on top.",powered:["Raspberry Pi Model B","Raspberry Pi A+","first wave of pi-based projects"],src:"https://www.raspberrypi.com/products/raspberry-pi-1-model-b-plus/"},
+  {year:2013,name:"Atmel ATmega32U4",mfr:"Atmel",type:"mcu",label:"8-bit AVR with native USB",desc:"AVR with on-chip USB. arduino leonardo, arduino micro, sparkfun pro micro, adafruit ItsyBitsy 32u4 ... the chip that let a microcontroller pretend to be a keyboard or mouse without an extra USB-serial chip. half of the maker-made keyboards on /r/mechanicalkeyboards through the late 2010s ran on this part.",powered:["Arduino Leonardo","SparkFun Pro Micro","DIY mechanical keyboards"],src:"https://www.microchip.com/en-us/product/ATmega32U4"},
+  {year:2014,name:"Espressif ESP8266",mfr:"Espressif Systems",type:"mcu",label:"32-bit Wi-Fi MCU",desc:"the $5 wi-fi chip that broke IoT open. shanghai-based espressif put a 32-bit tensilica core, full 802.11 b/g/n stack, and AT-command firmware on a single chip ... and sold it for almost nothing. the maker community reverse-engineered the SDK in months. internet things suddenly cost $5.",powered:["NodeMCU dev boards","Adafruit HUZZAH ESP8266","first wave of cheap IoT projects"],src:"https://www.espressif.com/en/products/socs/esp8266"},
+  {year:2015,name:"Espressif ESP8266 (mass adoption)",mfr:"Espressif Systems",type:"mcu",label:"32-bit Wi-Fi MCU",desc:"by 2015 espressif had open SDKs, an arduino core, and lua firmware (NodeMCU). the chip was now in millions of hobby projects, smart plugs, and indie startups. wi-fi for $2 in volume changed the math on every connected product.",powered:["Sonoff smart plugs","Particle photon (later)","explosion of IoT startups"],src:"https://www.espressif.com/en/products/socs/esp8266"},
+  {year:2016,name:"Espressif ESP32",mfr:"Espressif Systems",type:"mcu",label:"dual-core Wi-Fi + BT MCU",desc:"the ESP8266's bigger sibling. dual-core xtensa LX6 at 240 MHz, wi-fi + bluetooth 4.2, hardware crypto. for $5-$10 you got a real microcontroller with two radios. the ESP32 became the default chip for any hobby project that needed to talk to the internet.",powered:["Adafruit HUZZAH32","M5Stack","ESP32-CAM","thousands of indie hardware projects"],src:"https://www.espressif.com/en/products/socs/esp32"},
+  {year:2017,name:"Apple A11 Bionic",mfr:"Apple / TSMC",type:"cpu",label:"64-bit ARM SoC",desc:"the iphone X SoC. apple's first six-core CPU, first apple-designed GPU, first neural engine. on-device ML for face ID arrived here. the A11 was the moment apple silicon's lead over qualcomm and samsung became uncomfortable for everyone else.",powered:["iPhone 8","iPhone 8 Plus","iPhone X"],src:"https://en.wikipedia.org/wiki/Apple_A11"},
+  {year:2018,name:"Espressif ESP32 (Adafruit Feather era)",mfr:"Espressif Systems",type:"mcu",label:"dual-core Wi-Fi + BT MCU",desc:"by 2018 the ESP32 had circuitpython support, a mature arduino core, and was sitting at the heart of half the maker IoT projects on adafruit's learning system. the chip everyone reached for when the answer was 'something that talks wifi'.",powered:["Adafruit ESP32 Feather","TTGO LoRa boards","home automation hacks"],src:"https://learn.adafruit.com/welcome-to-circuitpython"},
+  {year:2019,name:"Nordic nRF52840",mfr:"Nordic Semiconductor",type:"mcu",label:"ARM Cortex-M4F + BLE",desc:"the bluetooth low energy maker chip. cortex-M4F at 64 MHz, BLE 5, USB, thread, zigbee. adafruit's circuit playground bluefruit and feather sense both run on it. when matter and thread arrived, this was the chip that was already there.",powered:["Adafruit Circuit Playground Bluefruit","Adafruit Feather Sense","particle xenon"],src:"https://www.nordicsemi.com/Products/nRF52840"},
+  {year:2020,name:"Apple M1",mfr:"Apple / TSMC",type:"cpu",label:"5nm ARM SoC for laptops",desc:"apple shipped ARM laptops in november 2020 and the rest of the laptop industry stopped pretending intel was inevitable. M1 mac mini, macbook air, macbook pro 13. battery life and performance gains the x86 vendors couldn't match.",powered:["MacBook Air (M1)","MacBook Pro 13 (M1)","Mac mini (M1)"],src:"https://www.apple.com/newsroom/2020/11/apple-unleashes-m1/"},
+  {year:2021,name:"Raspberry Pi RP2040",mfr:"Raspberry Pi Ltd",type:"mcu",label:"dual ARM Cortex-M0+",desc:"the pi foundation's first own-design silicon, launched 21 january 2021 in the $4 raspberry pi pico. dual cortex-M0+ at 133 MHz, 264 KB SRAM, eight programmable I/O state machines that act like tiny FPGAs. by 2024 raspberry pi had sold roughly four million picos and the RP2040 was in countless third-party boards.",powered:["Raspberry Pi Pico","Adafruit Feather RP2040","Adafruit KB2040","Pimoroni boards"],src:"https://www.raspberrypi.com/news/raspberry-pi-silicon-pico-now-on-sale/"},
+  {year:2022,name:"Espressif ESP32-S3",mfr:"Espressif Systems",type:"mcu",label:"dual LX7 + AI vector instructions",desc:"espressif's AIoT chip hit volume in 2022. dual xtensa LX7 at 240 MHz with vector instructions for neural network inference, native USB, BLE 5. the maker chip you pick when the project needs both wifi and a small ML model on-device.",powered:["Adafruit Feather ESP32-S3","M5Stack CoreS3","TinyS3","ESP32-S3-BOX"],src:"https://www.espressif.com/en/news/ESP32_S3"},
+  {year:2023,name:"NVIDIA H100",mfr:"NVIDIA / TSMC",type:"gpu",label:"hopper datacenter GPU",desc:"the chip that ran the generative AI boom. 80 billion transistors on TSMC 4N, transformer engine, FP8. by 2023 every major AI lab was bottlenecked by H100 supply. the chip that turned NVIDIA into the third trillion-dollar tech company.",powered:["GPT-4 training","Llama 2 training","every hyperscaler AI buildout"],src:"https://www.nvidia.com/en-us/data-center/h100/"},
+  {year:2024,name:"Raspberry Pi RP2350",mfr:"Raspberry Pi Ltd",type:"mcu",label:"dual ARM Cortex-M33 + dual RISC-V Hazard3",desc:"announced 8 august 2024. dual cortex-M33 at 150 MHz, dual hazard3 RISC-V cores you can hot-swap with the ARM cores at boot, hardware secure boot, more PIO state machines. the first mainstream microcontroller with both ARM and RISC-V on the same die ... at $0.80 in volume.",powered:["Raspberry Pi Pico 2","Adafruit Metro RP2350","Adafruit Feather RP2350","SparkFun Pro Micro RP2350"],src:"https://www.raspberrypi.com/news/raspberry-pi-pico-2-our-new-5-microcontroller-board-on-sale-now/"},
+  {year:2025,name:"NVIDIA Blackwell B200 / GB200",mfr:"NVIDIA / TSMC",type:"gpu",label:"blackwell datacenter GPU",desc:"the H100's successor. two reticle-limit dies fused into one GPU package, 208 billion transistors, second-generation transformer engine, FP4 inference. mass shipped through 2025. by year-end NVIDIA was on track to sell roughly $0.5 trillion of these and their kin.",powered:["Microsoft AI datacenters","AWS Trainium peers","every major AI training cluster"],src:"https://nvidianews.nvidia.com/news/nvidia-blackwell-platform-arrives-to-power-a-new-era-of-computing"},
+  {year:2026,name:"NVIDIA Vera Rubin",mfr:"NVIDIA / TSMC",type:"gpu",label:"Rubin GPU + Vera ARM CPU",desc:"announced in full production at CES 2026 (5 january). vera ARM CPU plus rubin GPU on a single superchip ... 50 petaflops FP4, HBM4 memory. NVIDIA's claimed 4x reduction in GPUs needed to train mixture-of-experts models versus blackwell. partner systems shipping H2 2026.",powered:["Microsoft Fairwater AI superfactory","CoreWeave Rubin instances","next-gen frontier model training"],src:"https://nvidianews.nvidia.com/news/rubin-platform-ai-supercomputer"}
+];
+
+// helpers
+function escapeHTML(s) {
+  return String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+}
+
+function cardHTML(y, asSpotlight) {
+  const tagClass = {
+    logic: 'logic',
+    opamp: 'opamp',
+    mem: 'mem',
+    cpu: '',
+    mcu: 'mcu',
+    gpu: 'gpu'
+  }[y.type] || '';
+  const powered = y.powered.map(p => `<li>${escapeHTML(p)}</li>`).join('');
+  const idAttr = asSpotlight ? '' : ` id="y${y.year}"`;
+  return `
+    <article class="year-card"${idAttr} data-year="${y.year}">
+      <div class="year-number">${y.year}</div>
+      <div class="chip-info">
+        <span class="chip-tag ${tagClass}">${escapeHTML(y.label)}</span>
+        <h3 class="chip-name">${escapeHTML(y.name)}</h3>
+        <p class="chip-meta">${escapeHTML(y.mfr)}</p>
+        <p class="chip-desc">${escapeHTML(y.desc)}</p>
+        <ul class="powered">${powered}</ul>
+        <a class="source-link" href="${y.src}" rel="noopener" target="_blank">→ source</a>
+      </div>
+    </article>
+  `;
+}
+
+// render full timeline
+const yearsEl = document.getElementById('years');
+yearsEl.innerHTML = YEARS.map(y => cardHTML(y, false)).join('');
+
+// year finder
+const input = document.getElementById('year-input');
+const findBtn = document.getElementById('find-btn');
+const spotlight = document.getElementById('spotlight');
+
+function findYear() {
+  const v = parseInt(input.value, 10);
+  if (!v || v < 1965 || v > 2026) {
+    spotlight.classList.remove('show');
+    spotlight.innerHTML = '';
+    input.focus();
+    return;
+  }
+  const y = YEARS.find(x => x.year === v);
+  if (!y) return;
+  spotlight.innerHTML = cardHTML(y, true);
+  spotlight.classList.add('show');
+  // scroll the timeline card into view and flash it
+  const target = document.getElementById('y' + v);
+  if (target) {
+    target.scrollIntoView({behavior:'smooth', block:'center'});
+    target.classList.remove('flash');
+    void target.offsetWidth;
+    target.classList.add('flash');
+    setTimeout(() => target.classList.remove('flash'), 2000);
+  }
+}
+
+findBtn.addEventListener('click', findYear);
+input.addEventListener('keydown', e => {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    findYear();
+  }
+});
+
+// keyboard arrows: ← / → to walk through years on the page
+document.addEventListener('keydown', e => {
+  if (document.activeElement === input) return;
+  if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+  // figure out which card is most-visible
+  const cards = Array.from(document.querySelectorAll('#years .year-card'));
+  let best = cards[0], bestDist = Infinity;
+  const mid = window.innerHeight / 2;
+  for (const c of cards) {
+    const r = c.getBoundingClientRect();
+    const cmid = r.top + r.height / 2;
+    const d = Math.abs(cmid - mid);
+    if (d < bestDist) { bestDist = d; best = c; }
+  }
+  const idx = cards.indexOf(best);
+  const next = e.key === 'ArrowRight' ? Math.min(cards.length - 1, idx + 1)
+                                       : Math.max(0, idx - 1);
+  cards[next].scrollIntoView({behavior:'smooth', block:'center'});
+});
+</script>
+
+</body>
+</html>
