@@ -1,0 +1,161 @@
+PCB Trace Current Capacity Reference
+====================================
+
+Calculator: https://ptorrone.github.io/artifacts/pcb-trace-current/
+Source:     IPC-2221, Generic Standard on Printed Board Design,
+            Section 6.2 (External Conductors)
+
+
+WHAT THIS CALCULATES
+--------------------
+
+The maximum continuous current a PCB trace can carry without
+exceeding a specified temperature rise above ambient.
+
+
+FORMULA
+-------
+
+  I = k * (dT ^ 0.44) * (A ^ 0.725)
+
+where:
+  I  = current, in amps
+  k  = layer constant (see below)
+  dT = temperature rise above ambient, in degrees Celsius
+  A  = cross-sectional area, in mils squared
+
+  A = w * t
+
+where:
+  w = trace width, in mils
+  t = copper thickness, in mils
+
+
+LAYER CONSTANT (k)
+------------------
+
+  External layer (top or bottom):  k = 0.048
+  Internal layer (buried):         k = 0.024
+
+Internal traces dissipate heat through surrounding FR4 instead of
+air, so capacity is roughly half that of an external trace at the
+same dimensions and temperature rise.
+
+
+COPPER WEIGHT TO THICKNESS
+--------------------------
+
+  oz/ft^2     thickness (mils)    thickness (um)
+  -------     ----------------    --------------
+    0.5            0.689               17.5
+    1.0            1.378               35.0
+    2.0            2.756               70.0
+    3.0            4.134              105.0
+    4.0            5.512              140.0
+
+
+LOOKUP: External trace, 20 C rise, 1 oz copper
+----------------------------------------------
+
+  Width (mils)    Cross-section (mil^2)    Max current (A)
+  ------------    ---------------------    ---------------
+       10                 13.78                  1.20
+       20                 27.56                  1.99
+       50                 68.90                  3.86
+      100                137.80                  6.38
+      200                275.60                 10.54
+      300                413.40                 14.14
+      500                689.00                 20.48
+
+
+LOOKUP: External trace, 20 C rise, 2 oz copper
+----------------------------------------------
+
+  Width (mils)    Cross-section (mil^2)    Max current (A)
+  ------------    ---------------------    ---------------
+       10                 27.56                  1.99
+       20                 55.12                  3.28
+       50                137.80                  6.38
+      100                275.60                 10.54
+      200                551.20                 17.42
+      300                826.80                 23.38
+      500               1378.00                 33.86
+
+
+LOOKUP: Internal trace, 20 C rise, 1 oz copper
+----------------------------------------------
+
+  Width (mils)    Cross-section (mil^2)    Max current (A)
+  ------------    ---------------------    ---------------
+       10                 13.78                  0.60
+       20                 27.56                  0.99
+       50                 68.90                  1.93
+      100                137.80                  3.19
+      200                275.60                  5.27
+      300                413.40                  7.07
+      500                689.00                 10.24
+
+
+LOOKUP: Internal trace, 20 C rise, 2 oz copper
+----------------------------------------------
+
+  Width (mils)    Cross-section (mil^2)    Max current (A)
+  ------------    ---------------------    ---------------
+       10                 27.56                  0.99
+       20                 55.12                  1.64
+       50                137.80                  3.19
+      100                275.60                  5.27
+      200                551.20                  8.71
+      300                826.80                 11.69
+      500               1378.00                 16.93
+
+
+LOOKUP: External, 1 oz, varying temperature rise
+------------------------------------------------
+
+  Width (mils)    10 C rise (A)    20 C rise (A)    30 C rise (A)
+  ------------    -------------    -------------    -------------
+       10              0.89             1.20             1.44
+       20              1.46             1.99             2.37
+       50              2.84             3.86             4.61
+      100              4.70             6.38             7.62
+      200              7.77            10.54            12.60
+      300             10.43            14.14            16.91
+      500             15.10            20.48            24.48
+
+
+UNIT REFERENCE
+--------------
+
+  1 mil      = 0.001 inch = 0.0254 mm = 25.4 micrometers
+  1 oz/ft^2  = 1.378 mils thick = 35 micrometers thick
+               (standard plating designation, by weight per unit area)
+
+
+CAVEATS
+-------
+
+The IPC-2221 formula assumes steady-state DC current in still air at
+standard atmospheric pressure with a single isolated trace. It does
+NOT account for:
+
+  - Forced air or liquid cooling (raises capacity)
+  - Adjacent traces in close proximity (reduces capacity due to
+    mutual heating)
+  - High-frequency skin effect (relevant above ~10 MHz)
+  - Pulsed or transient currents (use I^2*t analysis separately)
+  - Vias, which are typically the limiting factor in high-current
+    designs and require their own thermal analysis
+  - Solder mask presence (slightly raises external trace capacity)
+
+For mission-critical designs, simulate thermally with the actual
+board stackup and ambient conditions, or follow IPC-2152 (the
+successor standard) which corrects several conservatism issues
+in IPC-2221 and provides separate curves for internal vs external.
+
+
+GENERATED BY
+------------
+
+Adafruit Playground oEmbed widget
+https://ptorrone.github.io/artifacts/pcb-trace-current/

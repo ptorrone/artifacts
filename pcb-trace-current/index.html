@@ -6,7 +6,7 @@
 <title>PCB Trace Current Calculator · Adafruit Playground</title>
 <link rel="alternate"
       type="application/json+oembed"
-      href="https://adafruit.github.io/Adafruit_Learning_System_Embeds/pcb-trace-current/oembed.json"
+      href="https://ptorrone.github.io/artifacts/pcb-trace-current/oembed.json"
       title="PCB Trace Current Capacity">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -257,6 +257,60 @@ svg.plot {
 }
 .plot-foot .attr a:hover { color: var(--primary); border-color: var(--primary); }
 
+/* SCREEN-READER-ONLY UTILITY */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* PLOT FOCUS RING for keyboard users */
+svg.plot:focus { outline: 3px solid var(--primary); outline-offset: 2px; }
+svg.plot:focus:not(:focus-visible) { outline: none; }
+
+/* NOSCRIPT FALLBACK */
+.no-js {
+  max-width: 1300px;
+  margin: 0 auto;
+  border: 2px solid var(--primary);
+  border-radius: 14px;
+  padding: 22px;
+  font-size: 15px;
+  line-height: 1.5;
+}
+.no-js h2 { font-weight: 300; font-size: 24px; margin-bottom: 10px; }
+.no-js .formula-block {
+  font-family: Consolas, Monaco, monospace;
+  background: var(--surface-alt);
+  padding: 10px 14px;
+  border-radius: 4px;
+  margin: 12px 0;
+  color: var(--primary);
+  font-size: 14px;
+}
+.no-js table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 12px 0;
+  font-size: 14px;
+}
+.no-js th, .no-js td {
+  border: 1px solid var(--border);
+  padding: 6px 10px;
+  text-align: left;
+}
+.no-js th { background: var(--surface-alt); font-weight: 500; }
+.no-js td.num { text-align: right; font-family: Consolas, Monaco, monospace; }
+.no-js a { color: var(--primary); }
+.no-js p { margin: 8px 0; }
+.no-js .hint { color: var(--muted); font-size: 13px; }
+
 /* SVG STYLING */
 .grid-line { stroke: #EEEEEE; stroke-width: 1; shape-rendering: crispEdges; }
 .grid-line.major { stroke: var(--border); }
@@ -304,40 +358,85 @@ svg.plot {
   svg.plot { height: 260px; }
 }
 </style>
+<noscript>
+  <style>.embed { display: none; }</style>
+</noscript>
 </head>
 <body>
+
+<noscript>
+  <div class="no-js" role="region" aria-label="PCB Trace Current Capacity reference">
+    <h2>PCB Trace Current Capacity</h2>
+    <p>This is the static fallback shown when JavaScript is disabled. The interactive calculator requires JavaScript to compute and plot results. The reference values below cover the most common cases.</p>
+
+    <p><strong>Formula (IPC-2221, Section 6.2):</strong></p>
+    <div class="formula-block">I = k · &Delta;T<sup>0.44</sup> · A<sup>0.725</sup></div>
+    <p class="hint">where I is current in amps, k is the layer constant (0.048 external, 0.024 internal), &Delta;T is temperature rise above ambient in &deg;C, and A is the trace cross-sectional area in mil&sup2; (width × thickness).</p>
+
+    <p><strong>Copper weight to thickness:</strong></p>
+    <table>
+      <thead><tr><th>oz/ft&sup2;</th><th>mils</th><th>&micro;m</th></tr></thead>
+      <tbody>
+        <tr><td class="num">0.5</td><td class="num">0.689</td><td class="num">17.5</td></tr>
+        <tr><td class="num">1.0</td><td class="num">1.378</td><td class="num">35.0</td></tr>
+        <tr><td class="num">2.0</td><td class="num">2.756</td><td class="num">70.0</td></tr>
+      </tbody>
+    </table>
+
+    <p><strong>Lookup: external trace, 20&deg;C rise, 1 oz copper:</strong></p>
+    <table>
+      <thead><tr><th>Width (mils)</th><th>Cross-section (mil&sup2;)</th><th>Max current (A)</th></tr></thead>
+      <tbody>
+        <tr><td class="num">10</td><td class="num">13.78</td><td class="num">1.20</td></tr>
+        <tr><td class="num">20</td><td class="num">27.56</td><td class="num">1.99</td></tr>
+        <tr><td class="num">50</td><td class="num">68.90</td><td class="num">3.86</td></tr>
+        <tr><td class="num">100</td><td class="num">137.80</td><td class="num">6.38</td></tr>
+        <tr><td class="num">200</td><td class="num">275.60</td><td class="num">10.54</td></tr>
+        <tr><td class="num">300</td><td class="num">413.40</td><td class="num">14.14</td></tr>
+        <tr><td class="num">500</td><td class="num">689.00</td><td class="num">20.48</td></tr>
+      </tbody>
+    </table>
+
+    <p>For internal traces, multiply the external value by approximately 0.5 (since k drops from 0.048 to 0.024). For 2 oz copper, multiply external 1 oz values by approximately 1.65. Other temperature rises scale by (&Delta;T/20)<sup>0.44</sup>.</p>
+
+    <p>Full reference, including additional lookup tables, unit conversions, and caveats: <a href="reference.txt">reference.txt</a></p>
+  </div>
+</noscript>
 
 <div class="embed">
 
   <div class="embed-head">
     <h2>PCB Trace Current Capacity</h2>
-    <span class="formula">I = k · ΔT^0.44 · A^0.725 · IPC-2221</span>
+    <span class="formula" aria-hidden="true">I = k · ΔT^0.44 · A^0.725 · IPC-2221</span>
+    <span class="sr-only">Calculator based on the IPC-2221 PCB trace current capacity formula.</span>
   </div>
 
   <div class="embed-body">
     <div class="controls">
       <div class="control">
-        <label>Copper weight <span class="hint">0.25 to 4 oz/ft²</span></label>
-        <input type="range" id="t-slider" min="0" max="1000" value="500">
+        <label for="t-slider">Copper weight <span class="hint">0.25 to 4 oz/ft²</span></label>
+        <input type="range" id="t-slider" min="0" max="1000" value="500"
+               aria-valuetext="1.00 ounces per square foot, approximately 1.38 mils, 35 micrometers">
         <div class="val-row">
-          <span class="big-val" id="t-val">1.00</span>
-          <span class="unit">oz/ft²</span>
+          <span class="big-val" id="t-val" aria-hidden="true">1.00</span>
+          <span class="unit" aria-hidden="true">oz/ft²</span>
         </div>
-        <div class="sub-val" id="t-sub">≈ 1.38 mils · 35 µm</div>
+        <div class="sub-val" id="t-sub" aria-hidden="true">≈ 1.38 mils · 35 µm</div>
       </div>
       <div class="control">
-        <label>Temperature rise <span class="hint">above ambient</span></label>
-        <input type="range" id="dt-slider" min="5" max="60" value="20">
+        <label for="dt-slider">Temperature rise <span class="hint">above ambient</span></label>
+        <input type="range" id="dt-slider" min="5" max="60" value="20"
+               aria-valuetext="20 degrees Celsius rise above ambient">
         <div class="val-row">
-          <span class="big-val" id="dt-val">20</span>
-          <span class="unit">°C</span>
+          <span class="big-val" id="dt-val" aria-hidden="true">20</span>
+          <span class="unit" aria-hidden="true">°C</span>
         </div>
       </div>
       <div class="control">
-        <label>Layer</label>
-        <div class="layer-toggle">
-          <button class="active" data-k="0.048">External · k = 0.048</button>
-          <button data-k="0.024">Internal · k = 0.024</button>
+        <span class="control-label" id="layer-label" style="display:block;font-weight:500;margin-bottom:8px;">Layer</span>
+        <div class="layer-toggle" role="group" aria-labelledby="layer-label">
+          <button class="active" data-k="0.048" aria-pressed="true">External · k = 0.048</button>
+          <button data-k="0.024" aria-pressed="false">Internal · k = 0.024</button>
         </div>
       </div>
     </div>
@@ -361,11 +460,19 @@ svg.plot {
   </div>
 
   <div class="plot-frame">
-    <svg class="plot" id="pcb-plot" viewBox="0 0 800 380" preserveAspectRatio="none"></svg>
+    <svg class="plot" id="pcb-plot" viewBox="0 0 800 380" preserveAspectRatio="none"
+         role="slider"
+         tabindex="0"
+         aria-label="Trace width probe. Use left and right arrow keys to move."
+         aria-valuemin="5"
+         aria-valuemax="500"
+         aria-valuenow="100"
+         aria-valuetext="100 mil width, 6.37 amps maximum current"></svg>
     <div class="plot-foot">
-      <span>Click or drag on the plot to move the probe.</span>
+      <span>Click, drag, or use arrow keys on the plot to move the probe.</span>
       <span class="attr">via <a href="https://adafruit-playground.com">Adafruit Playground</a></span>
     </div>
+    <div class="sr-only" id="live-readout" aria-live="polite" aria-atomic="true"></div>
   </div>
 
 </div>
@@ -495,7 +602,7 @@ function drawPcbPlot(t_mils, dT, k) {
   pcbCtx = { wminLog, wRange };
 }
 
-function updatePCB() {
+function updatePCB(announceLive = true) {
   const oz = sliderToOz(+document.getElementById('t-slider').value);
   const t_mils = ozToMils(oz);
   const um = t_mils * 25.4;
@@ -507,10 +614,35 @@ function updatePCB() {
 
   const I = calcCurrent(cursorWmils, t_mils, dT, kFactor);
   const A = cursorWmils * t_mils;
+
+  // Slider accessible-text overrides (so SR doesn't say "500 of 1000")
+  document.getElementById('t-slider').setAttribute(
+    'aria-valuetext',
+    `${oz.toFixed(2)} ounces per square foot, approximately ${t_mils.toFixed(2)} mils, ${um.toFixed(0)} micrometers. Current at ${cursorWmils.toFixed(0)} mil width is ${I.toFixed(2)} amps.`
+  );
+  document.getElementById('dt-slider').setAttribute(
+    'aria-valuetext',
+    `${dT} degrees Celsius rise above ambient. Current at ${cursorWmils.toFixed(0)} mil width is ${I.toFixed(2)} amps.`
+  );
+
   document.getElementById('cursor-w').textContent    = cursorWmils.toFixed(0);
   document.getElementById('cursor-w-mm').textContent = (cursorWmils * 0.0254).toFixed(2);
   document.getElementById('i-val').textContent       = I.toFixed(2);
   document.getElementById('a-val').textContent       = A.toFixed(0);
+
+  // Plot accessible state (SVG has role="slider" — SR auto-announces these on focus + arrow keys)
+  const layerName = kFactor === 0.048 ? 'external' : 'internal';
+  const probeText = `${cursorWmils.toFixed(0)} mil width, ${I.toFixed(2)} amps maximum current at ${oz.toFixed(2)} ounce ${layerName} copper, ${dT} degree rise`;
+  const plotEl = document.getElementById('pcb-plot');
+  plotEl.setAttribute('aria-valuenow', cursorWmils.toFixed(0));
+  plotEl.setAttribute('aria-valuetext', probeText);
+
+  // Polite live region — only when source is NOT the plot's own keyboard slider
+  // (avoids double-announce: slider role already speaks valuetext on arrow-key)
+  if (announceLive) {
+    const live = document.getElementById('live-readout');
+    if (live) live.textContent = probeText;
+  }
 
   drawPcbPlot(t_mils, dT, kFactor);
 }
@@ -520,8 +652,12 @@ document.getElementById('dt-slider').addEventListener('input', updatePCB);
 
 document.querySelectorAll('.layer-toggle button').forEach(btn => {
   btn.addEventListener('click', () => {
-    document.querySelectorAll('.layer-toggle button').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.layer-toggle button').forEach(b => {
+      b.classList.remove('active');
+      b.setAttribute('aria-pressed', 'false');
+    });
     btn.classList.add('active');
+    btn.setAttribute('aria-pressed', 'true');
     kFactor = +btn.dataset.k;
     updatePCB();
   });
@@ -546,6 +682,34 @@ window.addEventListener('mouseup',    () => { dragging = false; });
 pcbPlot.addEventListener('touchstart', e => { dragging = true; probeAt(e.touches[0].clientX); e.preventDefault(); }, { passive: false });
 pcbPlot.addEventListener('touchmove',  e => { if (dragging) { probeAt(e.touches[0].clientX); e.preventDefault(); } }, { passive: false });
 window.addEventListener('touchend',    () => { dragging = false; });
+
+// Keyboard probe: arrow keys move the probe in log-space, Home/End jump to ends
+pcbPlot.addEventListener('keydown', e => {
+  const wmin = 5, wmax = 500;
+  const wminLog = Math.log10(wmin);
+  const wmaxLog = Math.log10(wmax);
+  const wRange = wmaxLog - wminLog;
+  const stepCoarse = wRange / 20;   // ~5% of log range
+  const stepFine   = wRange / 100;  // ~1% with shift held
+  let logW = Math.log10(Math.max(wmin, Math.min(wmax, cursorWmils)));
+  let handled = true;
+  switch (e.key) {
+    case 'ArrowLeft':  logW -= e.shiftKey ? stepFine : stepCoarse; break;
+    case 'ArrowRight': logW += e.shiftKey ? stepFine : stepCoarse; break;
+    case 'ArrowDown':  logW -= e.shiftKey ? stepFine : stepCoarse; break;
+    case 'ArrowUp':    logW += e.shiftKey ? stepFine : stepCoarse; break;
+    case 'Home':       logW = wminLog; break;
+    case 'End':        logW = wmaxLog; break;
+    case 'PageDown':   logW -= wRange / 5; break;
+    case 'PageUp':     logW += wRange / 5; break;
+    default: handled = false;
+  }
+  if (handled) {
+    e.preventDefault();
+    cursorWmils = Math.max(wmin, Math.min(wmax, Math.pow(10, logW)));
+    updatePCB(false); // SVG has role=slider; aria-valuetext fires automatically, skip live region
+  }
+});
 
 updatePCB();
 </script>
