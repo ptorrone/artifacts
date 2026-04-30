@@ -1,0 +1,10 @@
+{
+  "version": "1.0",
+  "type": "rich",
+  "provider_name": "Adafruit Playground",
+  "provider_url": "https://ptorrone.github.io/artifacts/",
+  "title": "PCB Trace Current Capacity",
+  "html": "<iframe src=\"https://ptorrone.github.io/artifacts/pcb-trace-current/\" style=\"display:block;width:100%;height:820px;border:0;\" loading=\"lazy\" title=\"PCB Trace Current Capacity\"></iframe>",
+  "width": 1300,
+  "height": 820
+}
