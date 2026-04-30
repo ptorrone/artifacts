@@ -524,11 +524,13 @@ function drawPcbPlot(t_mils, dT, k) {
   const xMap = w => PAD_L + (Math.log10(w) - wminLog) / wRange * (PLOT_W - PAD_L - PAD_R);
   const yMap = I => PAD_T + (yMax - I) / yMax * (PLOT_H - PAD_T - PAD_B);
 
-  const Ip = calcCurrent(cursorWmils, t_mils, dT, k);
+  // Probe position computed once, used by both title/desc and marker rendering
+  const wp = Math.max(wmin, Math.min(wmax, cursorWmils));
+  const Ip = calcCurrent(wp, t_mils, dT, k);
   const oz = t_mils / 1.378;
   const layerName = k === 0.048 ? 'external' : 'internal';
   // SVG title/desc: re-injected each render so AT sees current state
-  let s = `<title id="plot-title">Trace width probe at ${cursorWmils.toFixed(0)} mils, ${Ip.toFixed(2)} amps maximum current</title>`;
+  let s = `<title id="plot-title">Trace width probe at ${wp.toFixed(0)} mils, ${Ip.toFixed(2)} amps maximum current</title>`;
   s += `<desc id="plot-desc">Plot of maximum current versus trace width on a logarithmic axis. Active configuration: ${oz.toFixed(2)} ounce ${layerName} copper, ${dT} degree Celsius rise. Width range 5 to 500 mils, current range 0 to ${yMax} amps. Dotted gray curves show 0.5, 1, and 2 ounce reference copper weights for comparison.</desc>`;
 
   for (let dec = Math.ceil(wminLog); dec <= Math.floor(wmaxLog); dec++) {
@@ -602,9 +604,7 @@ function drawPcbPlot(t_mils, dT, k) {
   }
   s += `<path class="trace" d="${path}"/>`;
 
-  // probe cursor
-  let wp = Math.max(wmin, Math.min(wmax, cursorWmils));
-  const Ip = calcCurrent(wp, t_mils, dT, k);
+  // probe cursor (wp/Ip already computed above)
   const xp = xMap(wp);
   const yp = yMap(Math.min(Ip, yMax));
   s += `<line class="marker-line primary" x1="${xp}" y1="${PAD_T}" x2="${xp}" y2="${PLOT_H - PAD_B}"/>`;
