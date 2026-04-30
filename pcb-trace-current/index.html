@@ -176,15 +176,16 @@ input[type="range"]:focus { outline: none; }
 .layer-toggle { display: flex; }
 .layer-toggle button {
   flex: 1;
-  padding: 8px 10px;
+  padding: 12px 14px;
   background: var(--surface);
   border: 2px solid var(--primary);
   color: var(--primary);
   font-family: inherit;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.12s;
+  min-height: 44px;
 }
 .layer-toggle button:first-child { border-radius: 4px 0 0 4px; border-right-width: 1px; }
 .layer-toggle button:last-child  { border-radius: 0 4px 4px 0; border-left-width: 1px; }
@@ -208,7 +209,7 @@ input[type="range"]:focus { outline: none; }
 }
 .readout-label {
   font-size: 13px;
-  color: var(--muted);
+  color: #595959;
   margin-bottom: 6px;
 }
 .readout-val {
@@ -273,6 +274,16 @@ svg.plot {
 /* PLOT FOCUS RING for keyboard users */
 svg.plot:focus { outline: 3px solid var(--primary); outline-offset: 2px; }
 svg.plot:focus:not(:focus-visible) { outline: none; }
+
+/* RESPECT REDUCED MOTION */
+@media (prefers-reduced-motion: reduce) {
+  input[type="range"]::-webkit-slider-thumb,
+  input[type="range"]::-moz-range-thumb,
+  .layer-toggle button {
+    transition: none !important;
+  }
+  input[type="range"]::-webkit-slider-thumb:hover { transform: none; }
+}
 
 /* NOSCRIPT FALLBACK */
 .no-js {
@@ -399,7 +410,7 @@ svg.plot:focus:not(:focus-visible) { outline: none; }
 
     <p>For internal traces, multiply the external value by approximately 0.5 (since k drops from 0.048 to 0.024). For 2 oz copper, multiply external 1 oz values by approximately 1.65. Other temperature rises scale by (&Delta;T/20)<sup>0.44</sup>.</p>
 
-    <p>Full reference, including additional lookup tables, unit conversions, and caveats: <a href="reference.txt">reference.txt</a></p>
+    <p>Full reference table including additional copper weights, internal trace values, and IPC-2152 caveats: <a href="reference.txt" target="_blank" rel="noopener">reference.txt (plain text)</a></p>
   </div>
 </noscript>
 
@@ -434,9 +445,9 @@ svg.plot:focus:not(:focus-visible) { outline: none; }
       </div>
       <div class="control">
         <span class="control-label" id="layer-label" style="display:block;font-weight:500;margin-bottom:8px;">Layer</span>
-        <div class="layer-toggle" role="group" aria-labelledby="layer-label">
-          <button class="active" data-k="0.048" aria-pressed="true">External · k = 0.048</button>
-          <button data-k="0.024" aria-pressed="false">Internal · k = 0.024</button>
+        <div class="layer-toggle" role="radiogroup" aria-labelledby="layer-label">
+          <button class="active" data-k="0.048" role="radio" aria-checked="true" tabindex="0">External · k = 0.048</button>
+          <button data-k="0.024" role="radio" aria-checked="false" tabindex="-1">Internal · k = 0.024</button>
         </div>
       </div>
     </div>
@@ -467,10 +478,13 @@ svg.plot:focus:not(:focus-visible) { outline: none; }
          aria-valuemin="5"
          aria-valuemax="500"
          aria-valuenow="100"
-         aria-valuetext="100 mil width, 6.37 amps maximum current"></svg>
+         aria-valuetext="100 mil width, 6.37 amps maximum current">
+      <title id="plot-title">Trace width probe at 100 mils, 6.37 amps</title>
+      <desc id="plot-desc">Logarithmic plot of maximum current versus trace width. The blue curve shows the active configuration; dotted gray curves show 0.5, 1, and 2 ounce reference copper weights.</desc>
+    </svg>
     <div class="plot-foot">
-      <span>Click, drag, or use arrow keys on the plot to move the probe.</span>
-      <span class="attr">via <a href="https://adafruit-playground.com">Adafruit Playground</a></span>
+      <span>Click, drag, or focus the plot and press left/right arrows to move the probe. Shift for fine steps, Home/End for endpoints.</span>
+      <span class="attr">via <a href="https://adafruit-playground.com" target="_blank" rel="noopener">Adafruit Playground</a></span>
     </div>
     <div class="sr-only" id="live-readout" aria-live="polite" aria-atomic="true"></div>
   </div>
@@ -510,7 +524,12 @@ function drawPcbPlot(t_mils, dT, k) {
   const xMap = w => PAD_L + (Math.log10(w) - wminLog) / wRange * (PLOT_W - PAD_L - PAD_R);
   const yMap = I => PAD_T + (yMax - I) / yMax * (PLOT_H - PAD_T - PAD_B);
 
-  let s = '';
+  const Ip = calcCurrent(cursorWmils, t_mils, dT, k);
+  const oz = t_mils / 1.378;
+  const layerName = k === 0.048 ? 'external' : 'internal';
+  // SVG title/desc: re-injected each render so AT sees current state
+  let s = `<title id="plot-title">Trace width probe at ${cursorWmils.toFixed(0)} mils, ${Ip.toFixed(2)} amps maximum current</title>`;
+  s += `<desc id="plot-desc">Plot of maximum current versus trace width on a logarithmic axis. Active configuration: ${oz.toFixed(2)} ounce ${layerName} copper, ${dT} degree Celsius rise. Width range 5 to 500 mils, current range 0 to ${yMax} amps. Dotted gray curves show 0.5, 1, and 2 ounce reference copper weights for comparison.</desc>`;
 
   for (let dec = Math.ceil(wminLog); dec <= Math.floor(wmaxLog); dec++) {
     const w = Math.pow(10, dec);
@@ -650,16 +669,34 @@ function updatePCB(announceLive = true) {
 document.getElementById('t-slider').addEventListener('input',  updatePCB);
 document.getElementById('dt-slider').addEventListener('input', updatePCB);
 
-document.querySelectorAll('.layer-toggle button').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.layer-toggle button').forEach(b => {
-      b.classList.remove('active');
-      b.setAttribute('aria-pressed', 'false');
-    });
-    btn.classList.add('active');
-    btn.setAttribute('aria-pressed', 'true');
-    kFactor = +btn.dataset.k;
-    updatePCB();
+const radioBtns = document.querySelectorAll('.layer-toggle button');
+function selectRadio(target) {
+  radioBtns.forEach(b => {
+    const isTarget = b === target;
+    b.classList.toggle('active', isTarget);
+    b.setAttribute('aria-checked', isTarget ? 'true' : 'false');
+    b.setAttribute('tabindex', isTarget ? '0' : '-1');
+  });
+  kFactor = +target.dataset.k;
+  updatePCB();
+}
+radioBtns.forEach(btn => {
+  btn.addEventListener('click', () => { selectRadio(btn); btn.focus(); });
+  btn.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+      e.preventDefault();
+      const idx = Array.from(radioBtns).indexOf(btn);
+      const next = radioBtns[(idx + 1) % radioBtns.length];
+      selectRadio(next); next.focus();
+    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      const idx = Array.from(radioBtns).indexOf(btn);
+      const prev = radioBtns[(idx - 1 + radioBtns.length) % radioBtns.length];
+      selectRadio(prev); prev.focus();
+    } else if (e.key === ' ' || e.key === 'Enter') {
+      e.preventDefault();
+      selectRadio(btn);
+    }
   });
 });
 
