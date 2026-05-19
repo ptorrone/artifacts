@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PCB Trace Current Calculator · Adafruit Playground</title>
+<link rel="alternate"
+      type="application/json+oembed"
+      href="https://ptorrone.github.io/artifacts/pcb-trace-currentv2/oembed.json"
+      title="PCB Trace Current Capacity">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --primary: #0062C7;
+  --primary-hover: #003D7B;
+  --primary-surface: #D0EFFB;
+  --ink: #333333;
+  --muted: #767676;
+  --surface: #FFFFFF;
+  --surface-alt: #F0F0F0;
+  --border: #DDDDDD;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body { height: auto; }
+
+body {
+  font-family: 'Proxima Nova', Montserrat, 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Geneva, Verdana, sans-serif;
+  font-size: 16px;
+  line-height: 1.43;
+  letter-spacing: 0.02em;
+  color: var(--ink);
+  background: var(--surface);
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.embed {
+  max-width: 1300px;
+  margin: 0 auto;
+  border: 2px solid var(--primary);
+  border-radius: 14px;
+  background: var(--surface);
+  overflow: hidden;
+}
+
+.embed-head {
+  padding: 18px 22px 14px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.embed-head h2 {
+  font-weight: 300;
+  font-size: 28.8px;
+  line-height: 0.95;
+  color: var(--ink);
+}
+.embed-head .formula {
+  font-family: Consolas, Monaco, 'Lucida Console', monospace;
+  font-size: 13px;
+  color: var(--primary);
+  background: var(--surface-alt);
+  padding: 5px 10px;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+.embed-body {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.controls {
+  padding: 20px 22px;
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.control label {
+  display: block;
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 1.2;
+  margin-bottom: 8px;
+  color: var(--ink);
+}
+.control label .hint {
+  font-size: 13px;
+  color: var(--muted);
+  font-weight: 400;
+  margin-left: 6px;
+}
+
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 22px;
+  background: transparent;
+  cursor: pointer;
+  display: block;
+}
+input[type="range"]::-webkit-slider-runnable-track {
+  width: 100%;
+  height: 6px;
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+}
+input[type="range"]::-moz-range-track {
+  width: 100%;
+  height: 6px;
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 22px;
+  height: 22px;
+  margin-top: -9px;
+  background: var(--primary);
+  border: 3px solid var(--surface);
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px var(--primary);
+  cursor: grab;
+  transition: transform 0.12s, background 0.12s;
+}
+input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.1); }
+input[type="range"]::-webkit-slider-thumb:active { cursor: grabbing; background: var(--primary-hover); }
+input[type="range"]::-moz-range-thumb {
+  width: 22px;
+  height: 22px;
+  background: var(--primary);
+  border: 3px solid var(--surface);
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px var(--primary);
+  cursor: grab;
+}
+input[type="range"]:focus { outline: none; }
+
+.val-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-top: 10px;
+}
+.big-val {
+  font-weight: 800;
+  font-size: 26px;
+  line-height: 1.0;
+  color: var(--primary);
+  letter-spacing: -0.01em;
+}
+.unit {
+  font-size: 14px;
+  color: var(--muted);
+  font-weight: 400;
+}
+.sub-val {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+/* LAYER TOGGLE */
+.layer-toggle { display: flex; }
+.layer-toggle button {
+  flex: 1;
+  padding: 12px 14px;
+  background: var(--surface);
+  border: 2px solid var(--primary);
+  color: var(--primary);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.12s;
+  min-height: 44px;
+}
+.layer-toggle button:first-child { border-radius: 4px 0 0 4px; border-right-width: 1px; }
+.layer-toggle button:last-child  { border-radius: 0 4px 4px 0; border-left-width: 1px; }
+.layer-toggle button.active { background: var(--primary); color: white; }
+.layer-toggle button:hover:not(.active) { background: var(--primary-surface); }
+
+/* READOUTS */
+.readouts {
+  padding: 20px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  justify-content: center;
+  background: var(--surface-alt);
+}
+.readout {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 14px 16px;
+}
+.readout-label {
+  font-size: 13px;
+  color: #595959;
+  margin-bottom: 6px;
+}
+.readout-val {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+.readout-val > span:first-child {
+  font-weight: 800;
+  font-size: 38px;
+  line-height: 1.0;
+  color: var(--primary);
+  letter-spacing: -0.015em;
+}
+.readout.small .readout-val > span:first-child { font-size: 24px; }
+
+/* PLOT */
+.plot-frame {
+  padding: 14px 22px 16px;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+}
+svg.plot {
+  display: block;
+  width: 100%;
+  height: 320px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  cursor: crosshair;
+}
+.plot-foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 8px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.plot-foot .attr a {
+  color: var(--muted);
+  text-decoration: none;
+  border-bottom: 1px dotted var(--muted);
+}
+.plot-foot .attr a:hover { color: var(--primary); border-color: var(--primary); }
+
+/* SCREEN-READER-ONLY UTILITY */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* PLOT FOCUS RING for keyboard users */
+svg.plot:focus { outline: 3px solid var(--primary); outline-offset: 2px; }
+svg.plot:focus:not(:focus-visible) { outline: none; }
+
+/* RESPECT REDUCED MOTION */
+@media (prefers-reduced-motion: reduce) {
+  input[type="range"]::-webkit-slider-thumb,
+  input[type="range"]::-moz-range-thumb,
+  .layer-toggle button {
+    transition: none !important;
+  }
+  input[type="range"]::-webkit-slider-thumb:hover { transform: none; }
+}
+
+/* NOSCRIPT FALLBACK */
+.no-js {
+  max-width: 1300px;
+  margin: 0 auto;
+  border: 2px solid var(--primary);
+  border-radius: 14px;
+  padding: 22px;
+  font-size: 15px;
+  line-height: 1.5;
+}
+.no-js h2 { font-weight: 300; font-size: 24px; margin-bottom: 10px; }
+.no-js .formula-block {
+  font-family: Consolas, Monaco, monospace;
+  background: var(--surface-alt);
+  padding: 10px 14px;
+  border-radius: 4px;
+  margin: 12px 0;
+  color: var(--primary);
+  font-size: 14px;
+}
+.no-js table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 12px 0;
+  font-size: 14px;
+}
+.no-js th, .no-js td {
+  border: 1px solid var(--border);
+  padding: 6px 10px;
+  text-align: left;
+}
+.no-js th { background: var(--surface-alt); font-weight: 500; }
+.no-js td.num { text-align: right; font-family: Consolas, Monaco, monospace; }
+.no-js a { color: var(--primary); }
+.no-js p { margin: 8px 0; }
+.no-js .hint { color: var(--muted); font-size: 13px; }
+
+/* SVG STYLING */
+.grid-line { stroke: #EEEEEE; stroke-width: 1; shape-rendering: crispEdges; }
+.grid-line.major { stroke: var(--border); }
+.axis-label { fill: var(--muted); font-family: inherit; font-size: 11px; font-weight: 400; }
+.axis-title { fill: var(--muted); font-family: inherit; font-size: 11px; font-weight: 500; }
+.trace {
+  fill: none;
+  stroke: var(--primary);
+  stroke-width: 3;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+.marker-line { stroke-width: 1; stroke-dasharray: 4 4; }
+.marker-line.primary { stroke: var(--primary); opacity: 0.5; }
+.marker-dot { fill: var(--primary); stroke: var(--surface); stroke-width: 2; }
+.marker-label {
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  fill: var(--primary);
+}
+.ghost {
+  fill: none;
+  stroke: var(--muted);
+  stroke-width: 1;
+  stroke-dasharray: 2 4;
+  opacity: 0.35;
+}
+.ghost-label {
+  font-family: inherit;
+  font-size: 10px;
+  fill: var(--muted);
+  opacity: 0.7;
+}
+
+/* RESPONSIVE */
+@media (max-width: 700px) {
+  .embed-body { grid-template-columns: 1fr; }
+  .controls { border-right: none; border-bottom: 1px solid var(--border); }
+  .embed-head { padding: 16px 18px 12px; }
+  .embed-head h2 { font-size: 24px; }
+  .controls, .readouts, .plot-frame { padding: 16px 18px; }
+  .big-val { font-size: 22px; }
+  .readout-val > span:first-child { font-size: 30px; }
+  svg.plot { height: 260px; }
+}
+</style>
+<noscript>
+  <style>.embed { display: none; }</style>
+</noscript>
+</head>
+<body>
+
+<noscript>
+  <div class="no-js" role="region" aria-label="PCB Trace Current Capacity reference">
+    <h2>PCB Trace Current Capacity</h2>
+    <p>This is the static fallback shown when JavaScript is disabled. The interactive calculator requires JavaScript to compute and plot results. The reference values below cover the most common cases.</p>
+
+    <p><strong>Formula (IPC-2221, Section 6.2):</strong></p>
+    <div class="formula-block">I = k · &Delta;T<sup>0.44</sup> · A<sup>0.725</sup></div>
+    <p class="hint">where I is current in amps, k is the layer constant (0.048 external, 0.024 internal), &Delta;T is temperature rise above ambient in &deg;C, and A is the trace cross-sectional area in mil&sup2; (width × thickness).</p>
+
+    <p><strong>Copper weight to thickness:</strong></p>
+    <table>
+      <thead><tr><th>oz/ft&sup2;</th><th>mils</th><th>&micro;m</th></tr></thead>
+      <tbody>
+        <tr><td class="num">0.5</td><td class="num">0.689</td><td class="num">17.5</td></tr>
+        <tr><td class="num">1.0</td><td class="num">1.378</td><td class="num">35.0</td></tr>
+        <tr><td class="num">2.0</td><td class="num">2.756</td><td class="num">70.0</td></tr>
+      </tbody>
+    </table>
+
+    <p><strong>Lookup: external trace, 20&deg;C rise, 1 oz copper:</strong></p>
+    <table>
+      <thead><tr><th>Width (mils)</th><th>Cross-section (mil&sup2;)</th><th>Max current (A)</th></tr></thead>
+      <tbody>
+        <tr><td class="num">10</td><td class="num">13.78</td><td class="num">1.20</td></tr>
+        <tr><td class="num">20</td><td class="num">27.56</td><td class="num">1.99</td></tr>
+        <tr><td class="num">50</td><td class="num">68.90</td><td class="num">3.86</td></tr>
+        <tr><td class="num">100</td><td class="num">137.80</td><td class="num">6.38</td></tr>
+        <tr><td class="num">200</td><td class="num">275.60</td><td class="num">10.54</td></tr>
+        <tr><td class="num">300</td><td class="num">413.40</td><td class="num">14.14</td></tr>
+        <tr><td class="num">500</td><td class="num">689.00</td><td class="num">20.48</td></tr>
+      </tbody>
+    </table>
+
+    <p>For internal traces, multiply the external value by approximately 0.5 (since k drops from 0.048 to 0.024). For 2 oz copper, multiply external 1 oz values by approximately 1.65. Other temperature rises scale by (&Delta;T/20)<sup>0.44</sup>.</p>
+
+    <p>Full reference table including additional copper weights, internal trace values, and IPC-2152 caveats: <a href="reference.txt" target="_blank" rel="noopener">reference.txt (plain text)</a></p>
+  </div>
+</noscript>
+
+<div class="embed">
+
+  <div class="embed-head">
+    <h2>PCB Trace Current Capacity</h2>
+    <span class="formula" aria-hidden="true">I = k · ΔT^0.44 · A^0.725 · IPC-2221 / IPC-2152</span>
+    <span class="sr-only">Calculator based on the IPC-2221 and IPC-2152 PCB trace current capacity formulas.</span>
+  </div>
+
+  <div class="embed-body">
+    <div class="controls">
+      <div class="control">
+        <label for="t-slider">Copper weight <span class="hint">0.25 to 4 oz/ft²</span></label>
+        <input type="range" id="t-slider" min="0" max="1000" value="500"
+               aria-valuetext="1.00 ounces per square foot, approximately 1.38 mils, 35 micrometers">
+        <div class="val-row">
+          <span class="big-val" id="t-val" aria-hidden="true">1.00</span>
+          <span class="unit" aria-hidden="true">oz/ft²</span>
+        </div>
+        <div class="sub-val" id="t-sub" aria-hidden="true">≈ 1.38 mils · 35 µm</div>
+      </div>
+      <div class="control">
+        <label for="dt-slider">Temperature rise <span class="hint">above ambient</span></label>
+        <input type="range" id="dt-slider" min="5" max="60" value="20"
+               aria-valuetext="20 degrees Celsius rise above ambient">
+        <div class="val-row">
+          <span class="big-val" id="dt-val" aria-hidden="true">20</span>
+          <span class="unit" aria-hidden="true">°C</span>
+        </div>
+      </div>
+      <div class="control">
+        <span class="control-label" id="layer-label" style="display:block;font-weight:500;margin-bottom:8px;">Layer</span>
+        <div class="layer-toggle" role="radiogroup" aria-labelledby="layer-label">
+          <button class="active" data-k="0.048" role="radio" aria-checked="true" tabindex="0">External · k = 0.048</button>
+          <button data-k="0.024" role="radio" aria-checked="false" tabindex="-1">Internal · k = 0.024</button>
+        </div>
+      </div>
+      <div class="control">
+        <span class="control-label" id="std-label" style="display:block;font-weight:500;margin-bottom:8px;">Standard <span class="hint">— IPC-2152 corrects IPC-2221 conservatism (~30% more capacity for same trace)</span></span>
+        <div class="layer-toggle" role="radiogroup" aria-labelledby="std-label" id="std-toggle">
+          <button class="active" data-scale="1.00" role="radio" aria-checked="true" tabindex="0">IPC-2221 · conservative</button>
+          <button data-scale="1.30" role="radio" aria-checked="false" tabindex="-1">IPC-2152 · modern (×1.30)</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="readouts">
+      <div class="readout">
+        <div class="readout-label">at <span id="cursor-w">100</span> mil width · <span id="cursor-w-mm">2.54</span> mm</div>
+        <div class="readout-val">
+          <span id="i-val">6.37</span>
+          <span class="unit">A max</span>
+        </div>
+      </div>
+      <div class="readout small">
+        <div class="readout-label">Cross-section · A</div>
+        <div class="readout-val">
+          <span id="a-val">138</span>
+          <span class="unit">mil²</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="plot-frame">
+    <svg class="plot" id="pcb-plot" viewBox="0 0 800 380" preserveAspectRatio="none"
+         role="slider"
+         tabindex="0"
+         aria-label="Trace width probe. Use left and right arrow keys to move."
+         aria-valuemin="5"
+         aria-valuemax="500"
+         aria-valuenow="100"
+         aria-valuetext="100 mil width, 6.37 amps maximum current">
+      <title id="plot-title">Trace width probe at 100 mils, 6.37 amps</title>
+      <desc id="plot-desc">Logarithmic plot of maximum current versus trace width. The blue curve shows the active configuration; dotted gray curves show 0.5, 1, and 2 ounce reference copper weights.</desc>
+    </svg>
+    <div class="plot-foot">
+      <span>Click, drag, or focus the plot and press left/right arrows to move the probe. Shift for fine steps, Home/End for endpoints.</span>
+      <span class="attr">via <a href="https://adafruit-playground.com" target="_blank" rel="noopener">Adafruit Playground</a></span>
+    </div>
+    <div class="sr-only" id="live-readout" aria-live="polite" aria-atomic="true"></div>
+  </div>
+
+</div>
+
+<script>
+const PLOT_W = 800;
+const PLOT_H = 380;
+const PAD_L = 56;
+const PAD_R = 24;
+const PAD_T = 22;
+const PAD_B = 42;
+
+let kFactor = 0.048;
+let stdScale = 1.00;
+let cursorWmils = 100;
+
+function sliderToOz(s) { return 0.25 * Math.pow(16, s/1000); }
+function ozToMils(oz)  { return oz * 1.378; }
+function calcCurrent(w_mils, t_mils, dT, k) {
+  const A = w_mils * t_mils;
+  return stdScale * k * Math.pow(dT, 0.44) * Math.pow(A, 0.725);
+}
+
+let pcbCtx = null;
+
+function drawPcbPlot(t_mils, dT, k) {
+  const wmin = 5, wmax = 500;
+  const wminLog = Math.log10(wmin);
+  const wmaxLog = Math.log10(wmax);
+  const wRange  = wmaxLog - wminLog;
+
+  const Iend = calcCurrent(wmax, t_mils, dT, k);
+  const ladders = [1, 2, 5, 10, 15, 20, 30, 50, 75, 100, 150, 200, 300, 500];
+  let yMax = ladders.find(c => c >= Iend) || Math.ceil(Iend / 100) * 100;
+
+  const xMap = w => PAD_L + (Math.log10(w) - wminLog) / wRange * (PLOT_W - PAD_L - PAD_R);
+  const yMap = I => PAD_T + (yMax - I) / yMax * (PLOT_H - PAD_T - PAD_B);
+
+  // Probe position computed once, used by both title/desc and marker rendering
+  const wp = Math.max(wmin, Math.min(wmax, cursorWmils));
+  const Ip = calcCurrent(wp, t_mils, dT, k);
+  const oz = t_mils / 1.378;
+  const layerName = k === 0.048 ? 'external' : 'internal';
+  // SVG title/desc: re-injected each render so AT sees current state
+  let s = `<title id="plot-title">Trace width probe at ${wp.toFixed(0)} mils, ${Ip.toFixed(2)} amps maximum current</title>`;
+  s += `<desc id="plot-desc">Plot of maximum current versus trace width on a logarithmic axis. Active configuration: ${oz.toFixed(2)} ounce ${layerName} copper, ${dT} degree Celsius rise. Width range 5 to 500 mils, current range 0 to ${yMax} amps. Dotted gray curves show 0.5, 1, and 2 ounce reference copper weights for comparison.</desc>`;
+
+  for (let dec = Math.ceil(wminLog); dec <= Math.floor(wmaxLog); dec++) {
+    const w = Math.pow(10, dec);
+    if (w < wmin || w > wmax) continue;
+    const x = xMap(w);
+    s += `<line class="grid-line major" x1="${x}" y1="${PAD_T}" x2="${x}" y2="${PLOT_H - PAD_B}"/>`;
+    for (let m = 2; m <= 9; m++) {
+      const ww = m * w;
+      if (ww > wmin && ww < wmax) {
+        const xm = xMap(ww);
+        s += `<line class="grid-line" x1="${xm}" y1="${PAD_T}" x2="${xm}" y2="${PLOT_H - PAD_B}"/>`;
+      }
+    }
+  }
+  const xLabels = [5, 10, 20, 50, 100, 200, 500];
+  for (const w of xLabels) {
+    const x = xMap(w);
+    s += `<text class="axis-label" x="${x}" y="${PLOT_H - PAD_B + 16}" text-anchor="middle">${w}</text>`;
+  }
+  const steps = yMax >= 100 ? 10 : (yMax >= 30 ? 6 : 5);
+  for (let i = 0; i <= steps; i++) {
+    const I = (i * yMax) / steps;
+    const y = yMap(I);
+    const cls = (i === 0 || i === steps) ? 'major' : '';
+    s += `<line class="grid-line ${cls}" x1="${PAD_L}" y1="${y}" x2="${PLOT_W - PAD_R}" y2="${y}"/>`;
+    s += `<text class="axis-label" x="${PAD_L - 8}" y="${y + 3}" text-anchor="end">${I < 10 ? I.toFixed(1) : I.toFixed(0)}</text>`;
+  }
+
+  s += `<rect x="${PAD_L}" y="${PAD_T}" width="${PLOT_W - PAD_L - PAD_R}" height="${PLOT_H - PAD_T - PAD_B}" fill="none" stroke="#DDDDDD" stroke-width="1"/>`;
+  s += `<text class="axis-title" x="${PLOT_W - PAD_R}" y="${PLOT_H - 10}" text-anchor="end">WIDTH · mils · log</text>`;
+  s += `<text class="axis-title" x="${PAD_L}" y="${PAD_T - 8}">CURRENT · A</text>`;
+
+  // ghost reference curves (other common copper weights)
+  const refs = [
+    { oz: 0.5, mils: 0.689 },
+    { oz: 1.0, mils: 1.378 },
+    { oz: 2.0, mils: 2.756 },
+  ];
+  for (const r of refs) {
+    if (Math.abs(r.mils - t_mils) < 0.05) continue;
+    let p = '';
+    let started = false;
+    for (let i = 0; i <= 80; i++) {
+      const t = i / 80;
+      const w = Math.pow(10, wminLog + t * wRange);
+      const I = calcCurrent(w, r.mils, dT, k);
+      if (I > yMax) continue;
+      p += (started ? 'L' : 'M') + xMap(w).toFixed(1) + ',' + yMap(I).toFixed(1) + ' ';
+      started = true;
+    }
+    s += `<path class="ghost" d="${p}"/>`;
+    const wLabel = wmax * 0.93;
+    const Ilabel = calcCurrent(wLabel, r.mils, dT, k);
+    if (Ilabel <= yMax * 0.97) {
+      s += `<text class="ghost-label" x="${xMap(wLabel) - 4}" y="${yMap(Ilabel) - 4}" text-anchor="end">${r.oz} oz</text>`;
+    }
+  }
+
+  // active trace
+  const N = 400;
+  let path = '';
+  let trimStart = true;
+  for (let i = 0; i <= N; i++) {
+    const t = i / N;
+    const w = Math.pow(10, wminLog + t * wRange);
+    const I = calcCurrent(w, t_mils, dT, k);
+    if (I > yMax) continue;
+    path += (trimStart ? 'M' : 'L') + xMap(w).toFixed(1) + ',' + yMap(I).toFixed(1) + ' ';
+    trimStart = false;
+  }
+  s += `<path class="trace" d="${path}"/>`;
+
+  // probe cursor (wp/Ip already computed above)
+  const xp = xMap(wp);
+  const yp = yMap(Math.min(Ip, yMax));
+  s += `<line class="marker-line primary" x1="${xp}" y1="${PAD_T}" x2="${xp}" y2="${PLOT_H - PAD_B}"/>`;
+  s += `<line class="marker-line primary" x1="${PAD_L}" y1="${yp}" x2="${PLOT_W - PAD_R}" y2="${yp}"/>`;
+  s += `<circle class="marker-dot" cx="${xp}" cy="${yp}" r="6"/>`;
+
+  const labelText = `${wp.toFixed(0)} mil · ${Ip.toFixed(2)} A`;
+  const labelX = xp + 12 < PLOT_W - PAD_R - 110 ? xp + 12 : xp - 12;
+  const anchor = xp + 12 < PLOT_W - PAD_R - 110 ? 'start' : 'end';
+  const labelY = yp - 12 > PAD_T + 14 ? yp - 12 : yp + 22;
+  s += `<text class="marker-label" x="${labelX}" y="${labelY}" text-anchor="${anchor}">${labelText}</text>`;
+
+  document.getElementById('pcb-plot').innerHTML = s;
+  pcbCtx = { wminLog, wRange };
+}
+
+function updatePCB(announceLive = true) {
+  const oz = sliderToOz(+document.getElementById('t-slider').value);
+  const t_mils = ozToMils(oz);
+  const um = t_mils * 25.4;
+  const dT = +document.getElementById('dt-slider').value;
+
+  document.getElementById('t-val').textContent  = oz.toFixed(2);
+  document.getElementById('t-sub').textContent  = `≈ ${t_mils.toFixed(2)} mils · ${um.toFixed(0)} µm`;
+  document.getElementById('dt-val').textContent = dT;
+
+  const I = calcCurrent(cursorWmils, t_mils, dT, kFactor);
+  const A = cursorWmils * t_mils;
+
+  // Slider accessible-text overrides (so SR doesn't say "500 of 1000")
+  document.getElementById('t-slider').setAttribute(
+    'aria-valuetext',
+    `${oz.toFixed(2)} ounces per square foot, approximately ${t_mils.toFixed(2)} mils, ${um.toFixed(0)} micrometers. Current at ${cursorWmils.toFixed(0)} mil width is ${I.toFixed(2)} amps.`
+  );
+  document.getElementById('dt-slider').setAttribute(
+    'aria-valuetext',
+    `${dT} degrees Celsius rise above ambient. Current at ${cursorWmils.toFixed(0)} mil width is ${I.toFixed(2)} amps.`
+  );
+
+  document.getElementById('cursor-w').textContent    = cursorWmils.toFixed(0);
+  document.getElementById('cursor-w-mm').textContent = (cursorWmils * 0.0254).toFixed(2);
+  document.getElementById('i-val').textContent       = I.toFixed(2);
+  document.getElementById('a-val').textContent       = A.toFixed(0);
+
+  // Plot accessible state (SVG has role="slider" — SR auto-announces these on focus + arrow keys)
+  const layerName = kFactor === 0.048 ? 'external' : 'internal';
+  const probeText = `${cursorWmils.toFixed(0)} mil width, ${I.toFixed(2)} amps maximum current at ${oz.toFixed(2)} ounce ${layerName} copper, ${dT} degree rise`;
+  const plotEl = document.getElementById('pcb-plot');
+  plotEl.setAttribute('aria-valuenow', cursorWmils.toFixed(0));
+  plotEl.setAttribute('aria-valuetext', probeText);
+
+  // Polite live region — only when source is NOT the plot's own keyboard slider
+  // (avoids double-announce: slider role already speaks valuetext on arrow-key)
+  if (announceLive) {
+    const live = document.getElementById('live-readout');
+    if (live) live.textContent = probeText;
+  }
+
+  drawPcbPlot(t_mils, dT, kFactor);
+}
+
+document.getElementById('t-slider').addEventListener('input',  updatePCB);
+document.getElementById('dt-slider').addEventListener('input', updatePCB);
+
+const radioBtns = document.querySelectorAll('[aria-labelledby="layer-label"] button');
+function selectRadio(target) {
+  radioBtns.forEach(b => {
+    const isTarget = b === target;
+    b.classList.toggle('active', isTarget);
+    b.setAttribute('aria-checked', isTarget ? 'true' : 'false');
+    b.setAttribute('tabindex', isTarget ? '0' : '-1');
+  });
+  kFactor = +target.dataset.k;
+  updatePCB();
+}
+radioBtns.forEach(btn => {
+  btn.addEventListener('click', () => { selectRadio(btn); btn.focus(); });
+  btn.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+      e.preventDefault();
+      const idx = Array.from(radioBtns).indexOf(btn);
+      const next = radioBtns[(idx + 1) % radioBtns.length];
+      selectRadio(next); next.focus();
+    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      const idx = Array.from(radioBtns).indexOf(btn);
+      const prev = radioBtns[(idx - 1 + radioBtns.length) % radioBtns.length];
+      selectRadio(prev); prev.focus();
+    } else if (e.key === ' ' || e.key === 'Enter') {
+      e.preventDefault();
+      selectRadio(btn);
+    }
+  });
+});
+
+// IPC-2221 vs IPC-2152 standard toggle
+const stdBtns = document.querySelectorAll('#std-toggle button');
+function selectStd(target) {
+  stdBtns.forEach(b => {
+    const isTarget = b === target;
+    b.classList.toggle('active', isTarget);
+    b.setAttribute('aria-checked', isTarget ? 'true' : 'false');
+    b.setAttribute('tabindex', isTarget ? '0' : '-1');
+  });
+  stdScale = +target.dataset.scale;
+  updatePCB();
+}
+stdBtns.forEach(btn => {
+  btn.addEventListener('click', () => { selectStd(btn); btn.focus(); });
+  btn.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+      e.preventDefault();
+      const idx = Array.from(stdBtns).indexOf(btn);
+      const next = stdBtns[(idx + 1) % stdBtns.length];
+      selectStd(next); next.focus();
+    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      const idx = Array.from(stdBtns).indexOf(btn);
+      const prev = stdBtns[(idx - 1 + stdBtns.length) % stdBtns.length];
+      selectStd(prev); prev.focus();
+    } else if (e.key === ' ' || e.key === 'Enter') {
+      e.preventDefault();
+      selectStd(btn);
+    }
+  });
+});
+
+const pcbPlot = document.getElementById('pcb-plot');
+let dragging = false;
+function probeAt(clientX) {
+  if (!pcbCtx) return;
+  const rect = pcbPlot.getBoundingClientRect();
+  const xRatio = (clientX - rect.left) / rect.width;
+  const xPx = xRatio * PLOT_W;
+  const t = (xPx - PAD_L) / (PLOT_W - PAD_L - PAD_R);
+  if (t < 0 || t > 1) return;
+  const w = Math.pow(10, pcbCtx.wminLog + t * pcbCtx.wRange);
+  cursorWmils = w;
+  updatePCB();
+}
+pcbPlot.addEventListener('mousedown', e => { dragging = true;  probeAt(e.clientX); });
+pcbPlot.addEventListener('mousemove', e => { if (dragging) probeAt(e.clientX); });
+window.addEventListener('mouseup',    () => { dragging = false; });
+pcbPlot.addEventListener('touchstart', e => { dragging = true; probeAt(e.touches[0].clientX); e.preventDefault(); }, { passive: false });
+pcbPlot.addEventListener('touchmove',  e => { if (dragging) { probeAt(e.touches[0].clientX); e.preventDefault(); } }, { passive: false });
+window.addEventListener('touchend',    () => { dragging = false; });
+
+// Keyboard probe: arrow keys move the probe in log-space, Home/End jump to ends
+pcbPlot.addEventListener('keydown', e => {
+  const wmin = 5, wmax = 500;
+  const wminLog = Math.log10(wmin);
+  const wmaxLog = Math.log10(wmax);
+  const wRange = wmaxLog - wminLog;
+  const stepCoarse = wRange / 20;   // ~5% of log range
+  const stepFine   = wRange / 100;  // ~1% with shift held
+  let logW = Math.log10(Math.max(wmin, Math.min(wmax, cursorWmils)));
+  let handled = true;
+  switch (e.key) {
+    case 'ArrowLeft':  logW -= e.shiftKey ? stepFine : stepCoarse; break;
+    case 'ArrowRight': logW += e.shiftKey ? stepFine : stepCoarse; break;
+    case 'ArrowDown':  logW -= e.shiftKey ? stepFine : stepCoarse; break;
+    case 'ArrowUp':    logW += e.shiftKey ? stepFine : stepCoarse; break;
+    case 'Home':       logW = wminLog; break;
+    case 'End':        logW = wmaxLog; break;
+    case 'PageDown':   logW -= wRange / 5; break;
+    case 'PageUp':     logW += wRange / 5; break;
+    default: handled = false;
+  }
+  if (handled) {
+    e.preventDefault();
+    cursorWmils = Math.max(wmin, Math.min(wmax, Math.pow(10, logW)));
+    updatePCB(false); // SVG has role=slider; aria-valuetext fires automatically, skip live region
+  }
+});
+
+updatePCB();
+</script>
+</body>
+</html>

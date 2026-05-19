@@ -1,0 +1,10 @@
+{
+  "version": "1.0",
+  "type": "rich",
+  "provider_name": "Adafruit Playground",
+  "provider_url": "https://ptorrone.github.io/artifacts/",
+  "title": "PCB Trace Current Capacity (v2 · IPC-2221 + IPC-2152)",
+  "html": "<iframe src=\"https://ptorrone.github.io/artifacts/pcb-trace-currentv2/\" style=\"display:block;width:100%;height:900px;border:0;\" loading=\"lazy\" title=\"PCB Trace Current Capacity\"></iframe>",
+  "width": 1300,
+  "height": 900
+}
